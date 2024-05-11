@@ -1,16 +1,16 @@
-# This is a sample Python script.
+from fastapi import FastAPI
+from sqlalchemy import select
 
-# Press Shift+F10 to execute it or replace it with your code.
-# Press Double Shift to search everywhere for classes, files, tool windows, actions, and settings.
+from db import new_session
+from models import DoctorOrm
+from schemas import Doctor
+
+app = FastAPI()
 
 
-def print_hi(name):
-    # Use a breakpoint in the code line below to debug your script.
-    print(f'Hi, {name}')  # Press Ctrl+F8 to toggle the breakpoint.
-
-
-# Press the green button in the gutter to run the script.
-if __name__ == '__main__':
-    print_hi('PyCharm')
-
-# See PyCharm help at https://www.jetbrains.com/help/pycharm/
+@app.get('/doctors')
+async def get_doctors() -> list[Doctor]:
+    async with new_session() as session:
+        query = select(DoctorOrm)
+        result = await session.execute(query)
+        return [Doctor.model_validate(obj) for obj in result.scalars().all()]
