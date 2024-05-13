@@ -8,7 +8,7 @@ from sqlalchemy.ext.asyncio import async_engine_from_config
 
 from sqlmodel import SQLModel
 
-from models import Song
+from models import *
 from settings import settings
 
 # this is the Alembic Config object, which provides
