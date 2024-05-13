@@ -1,4 +1,5 @@
-from settings import settings
+from fastapi import FastAPI
 
+from models import *
 
-print(settings)
+app = FastAPI()
