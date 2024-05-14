@@ -9,8 +9,11 @@ pydantic-settings = "^2.2.1"
 cryptography = "^42.0.7"
 alembic = "^1.13.1"
 aiomysql = "^0.2.0"
-
+black = "^24.4.2"
 
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
+
+[tool.black]
+line-length = 120
