@@ -1,10 +1,10 @@
 __all__ = [
     "Base",
     "AdministrationRouteOrm",
-    "Customer"
+    "CustomerOrm"
 
 ]
 
 from .base import Base
 from .administration_route import AdministrationRouteOrm
-from .customer import Customer
+from .customer import CustomerOrm
