@@ -1,4 +1,4 @@
-from sqlalchemy import String, ForeignKey
+from sqlalchemy import String, ForeignKey, CheckConstraint
 from sqlalchemy.orm import Mapped, mapped_column
 
 from .base import Base
@@ -9,8 +9,8 @@ class DrugOrm(Base):
 
     id: Mapped[int] = mapped_column(primary_key=True)
     name: Mapped[str] = mapped_column(String(256), unique=True)
-    cost: Mapped[int] = mapped_column()
-    shelf_life: Mapped[int] = mapped_column()
-    critical_amount: Mapped[int] = mapped_column()
+    cost: Mapped[int] = mapped_column(CheckConstraint('cost > 0'))
+    shelf_life: Mapped[int] = mapped_column(CheckConstraint('shelf_life > 0'))
+    critical_amount: Mapped[int] = mapped_column(CheckConstraint('critical_amount >= 0'))
     type_id: Mapped[int] = mapped_column(ForeignKey("drug_types.id"))
     description: Mapped[str] = mapped_column(String(256))
