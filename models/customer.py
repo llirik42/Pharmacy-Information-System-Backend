@@ -8,6 +8,6 @@ class CustomerOrm(Base):
     __tablename__ = 'customers'
 
     id: Mapped[int] = mapped_column(primary_key=True)
-    full_name: Mapped[str] = mapped_column(String(256), nullable=False)
-    phone_number: Mapped[str] = mapped_column(String(32), nullable=False)
-    address: Mapped[str] = mapped_column(String(256), nullable=False)
+    full_name: Mapped[str] = mapped_column(String(256))
+    phone_number: Mapped[str] = mapped_column(String(32))
+    address: Mapped[str] = mapped_column(String(256))

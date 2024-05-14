@@ -8,4 +8,4 @@ class AdministrationRouteOrm(Base):
     __tablename__ = "administration_routes"
 
     id: Mapped[int] = mapped_column(primary_key=True)
-    description: Mapped[str] = mapped_column(String(256), unique=True, nullable=False)
+    description: Mapped[str] = mapped_column(String(256), unique=True)
