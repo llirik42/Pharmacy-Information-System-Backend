@@ -3,8 +3,8 @@ from typing import Optional
 
 from pydantic import BaseModel, Field
 
-from .prescription import Prescription
 from .customer import Customer
+from .prescription import Prescription
 
 
 class Order(BaseModel):

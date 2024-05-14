@@ -1,7 +1,7 @@
 from pydantic import BaseModel, Field
 
-from .patient import Patient
 from .doctor import Doctor
+from .patient import Patient
 from .prescription_item import PrescriptionItem
 
 

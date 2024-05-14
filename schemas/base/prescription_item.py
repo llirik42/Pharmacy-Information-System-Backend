@@ -1,7 +1,7 @@
 from pydantic import BaseModel, Field
 
-from .drug import Drug
 from .administration_route import AdministrationRoute
+from .drug import Drug
 
 
 class PrescriptionItem(BaseModel):
