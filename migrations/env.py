@@ -15,11 +15,7 @@ from settings import settings
 config = context.config
 
 section = config.config_ini_section
-config.set_section_option(section, "DB_URL", (f"mysql+aiomysql://"
-                                              f"{settings.db_host}:{settings.db_port}/"
-                                              f"{settings.db_name}?"
-                                              f"user={settings.db_user}"
-                                              f"&password={settings.db_password}"))
+config.set_section_option(section, "DB_URL", settings.db_url)
 
 # Interpret the config file for Python logging.
 # This line sets up loggers basically.
