@@ -4,7 +4,8 @@ __all__ = [
     "CustomerOrm",
     "DoctorOrm",
     "DrugTypeOrm",
-    "DrugOrm"
+    "DrugOrm",
+    "LabWorkerOrm"
 ]
 
 from .base import Base
@@ -13,3 +14,5 @@ from .customer import CustomerOrm
 from .doctor import DoctorOrm
 from .drug_type import DrugTypeOrm
 from .drug import DrugOrm
+from .lab_worker import LabWorkerOrm
+from .drug_type_administration_route import DrugTypeAdministrationRouteOrm
