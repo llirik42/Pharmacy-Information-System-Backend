@@ -6,7 +6,7 @@ from .drug import DrugOrm
 
 
 class SalveOrm(Base):
-    __tablename__ = 'salves'
+    __tablename__ = "salves"
 
     drug_id: Mapped[int] = mapped_column(ForeignKey("drugs.id"), primary_key=True)
     active_substance: Mapped[str] = mapped_column(String(256))

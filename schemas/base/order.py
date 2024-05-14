@@ -12,5 +12,5 @@ class Order(BaseModel):
     registration_datetime: datetime
     appointed_datetime: Optional[datetime] = None
     obtaining_datetime: Optional[datetime] = None
-    is_paid: bool = Field(validation_alias='paid')
+    is_paid: bool = Field(validation_alias="paid")
     customer: Optional[Customer] = None

@@ -5,7 +5,7 @@ from .base import Base
 
 
 class DoctorOrm(Base):
-    __tablename__ = 'doctors'
+    __tablename__ = "doctors"
 
     id: Mapped[int] = mapped_column(primary_key=True)
     full_name: Mapped[str] = mapped_column(String(256), unique=True)

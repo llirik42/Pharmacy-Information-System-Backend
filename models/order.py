@@ -7,12 +7,12 @@ from .base import Base
 
 
 class OrderOrm(Base):
-    __tablename__ = 'orders'
+    __tablename__ = "orders"
 
     id: Mapped[int] = mapped_column(primary_key=True)
-    prescription_id: Mapped[int] = mapped_column(ForeignKey('prescriptions.id'))
+    prescription_id: Mapped[int] = mapped_column(ForeignKey("prescriptions.id"))
     registration_datetime: Mapped[datetime] = mapped_column()
     appointed_datetime: Mapped[datetime] = mapped_column(nullable=True)
     obtaining_datetime: Mapped[datetime] = mapped_column(nullable=True)
     paid: Mapped[bool] = mapped_column(default=False)
-    customer_id: Mapped[int] = mapped_column(ForeignKey('customers.id'), nullable=True)
+    customer_id: Mapped[int] = mapped_column(ForeignKey("customers.id"), nullable=True)

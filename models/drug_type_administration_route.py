@@ -5,7 +5,7 @@ from .base import Base
 
 
 class DrugTypeAdministrationRouteOrm(Base):
-    __tablename__ = 'drug_types_administration_routes'
+    __tablename__ = "drug_types_administration_routes"
 
-    type_id: Mapped[int] = mapped_column(ForeignKey('drug_types.id'), primary_key=True)
-    route_id: Mapped[int] = mapped_column(ForeignKey('administration_routes.id'), primary_key=True)
+    type_id: Mapped[int] = mapped_column(ForeignKey("drug_types.id"), primary_key=True)
+    route_id: Mapped[int] = mapped_column(ForeignKey("administration_routes.id"), primary_key=True)

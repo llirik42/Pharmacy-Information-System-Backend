@@ -26,7 +26,7 @@ __all__ = [
     "OrderWaitingDrugSupplyOrm",
     "ReservedDrugOrm",
     "ProductionLabWorkerOrm",
-    "TechnologyComponentOrm"
+    "TechnologyComponentOrm",
 ]
 
 from .administration_route import AdministrationRouteOrm

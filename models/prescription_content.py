@@ -5,7 +5,7 @@ from .base import Base
 
 
 class PrescriptionItemOrm(Base):
-    __tablename__ = 'prescriptions_content'
+    __tablename__ = "prescriptions_content"
 
     prescription_id: Mapped[int] = mapped_column(ForeignKey("prescriptions.id"), primary_key=True)
     drug_id: Mapped[int] = mapped_column(ForeignKey("drugs.id"), primary_key=True)

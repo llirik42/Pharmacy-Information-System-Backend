@@ -6,8 +6,8 @@ from .drug import DrugOrm
 
 
 class SolutionOrm(Base):
-    __tablename__ = 'solutions'
+    __tablename__ = "solutions"
 
     drug_id: Mapped[int] = mapped_column(ForeignKey("drugs.id"), primary_key=True)
-    dosage: Mapped[int] = mapped_column(CheckConstraint('(0 <= dosage) and (dosage <= 100)'))
+    dosage: Mapped[int] = mapped_column(CheckConstraint("(0 <= dosage) and (dosage <= 100)"))
     drug: Mapped[DrugOrm] = relationship(single_parent=True)

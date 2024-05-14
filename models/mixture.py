@@ -6,7 +6,7 @@ from .drug import DrugOrm
 
 
 class MixtureOrm(Base):
-    __tablename__ = 'mixtures'
+    __tablename__ = "mixtures"
 
     drug_id: Mapped[int] = mapped_column(ForeignKey("drugs.id"), primary_key=True)
     solvent: Mapped[str] = mapped_column(String(256))

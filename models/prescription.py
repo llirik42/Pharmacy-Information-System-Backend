@@ -7,7 +7,7 @@ from .base import Base
 
 
 class PrescriptionOrm(Base):
-    __tablename__ = 'prescriptions'
+    __tablename__ = "prescriptions"
 
     id: Mapped[int] = mapped_column(primary_key=True)
     diagnosis: Mapped[str] = mapped_column(String(512))
@@ -15,6 +15,4 @@ class PrescriptionOrm(Base):
     doctor_id: Mapped[int] = mapped_column(ForeignKey("doctors.id"))
     date: Mapped[date] = mapped_column(Date())
 
-    __table_args__ = (
-        UniqueConstraint('diagnosis', 'patient_id', 'doctor_id', 'date'),
-    )
+    __table_args__ = (UniqueConstraint("diagnosis", "patient_id", "doctor_id", "date"),)
