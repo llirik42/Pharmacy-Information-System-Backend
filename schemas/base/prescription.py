@@ -1,9 +1,9 @@
-from pydantic import BaseModel, Field
+from pydantic import Field
 
+from .base import Base
 from .doctor import Doctor
 from .patient import Patient
 from .prescription_item import PrescriptionItem
-from .base import Base
 
 
 class Prescription(Base):

@@ -1,6 +1,7 @@
-from pydantic import BaseModel, Field
+from pydantic import Field
 
 from .base import Base
+
 
 class Supplier(Base):
     name: str = Field(max_length=256)

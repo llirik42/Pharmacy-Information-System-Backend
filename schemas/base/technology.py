@@ -4,7 +4,6 @@ from pydantic import BaseModel, Field
 
 from .drug import Drug
 from .technology_component import TechnologyComponent
-from .base import Base
 
 
 class Technology(BaseModel):

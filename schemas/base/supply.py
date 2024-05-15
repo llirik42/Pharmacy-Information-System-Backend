@@ -1,11 +1,11 @@
 from datetime import datetime
 from typing import Optional
 
-from pydantic import BaseModel, Field
+from pydantic import Field
 
+from .base import Base
 from .drug import Drug
 from .supplier import Supplier
-from .base import Base
 
 
 class Supply(Base):

@@ -1,6 +1,6 @@
 from pydantic import Field
 
-from schemas.base.customer import Customer
+from .base.customer import Customer
 
 
 class FrequentCustomer(Customer):

@@ -1,9 +1,9 @@
 from datetime import datetime
 
-from pydantic import BaseModel, Field
+from pydantic import Field
 
-from .drug import Drug
 from .base import Base
+from .drug import Drug
 
 
 class StorageItem(Base):
