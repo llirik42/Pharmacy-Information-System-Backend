@@ -20,8 +20,67 @@ async def get_drugs(session: AsyncSession = Depends(get_session)) -> list[Drug]:
 
 
 @router.get("/popular")
-async def get_popular_drugs(limit: int = 10, drug_type_id: Optional[int] = None) -> list[UsedDrug]:
-    return []
+async def get_popular_drugs(limit: int = 10, drug_type_id: Optional[int] = None, session: AsyncSession = Depends(get_session)) -> list[UsedDrug]:
+    tmp = "" if drug_type_id is None else f"where type_id = {drug_type_id}"
+
+    query_string = f"""
+        with
+            used_in_cooking_drugs as (
+                select
+                    component_id as drug_id,
+                    sum(component_amount) as drug_amount
+                from production
+                    join technology_components on production.technology_id = technology_components.technology_id
+                    join drugs on technology_components.component_id = drugs.id
+                where start is not null
+                group by component_id
+            ),
+    
+            sold_drugs as (
+                select
+                    drug_id,
+                    sum(amount) as drug_amount
+                from orders
+                    join prescriptions_content using (prescription_id)
+                where obtaining_datetime is not null
+                group by drug_id
+            ),
+    
+            used_drugs as (
+                select
+                    drug_id,
+                    drugs.name,
+                    sum(drug_amount) as drug_amount
+                from (
+                    select *
+                    from used_in_cooking_drugs
+                    union all
+                    select *
+                    from sold_drugs
+                    ) as _
+                    join drugs on drug_id = drugs.id
+                {tmp}
+                group by drug_id)
+                
+        select drug_id, drug_amount
+        from used_drugs
+        order by drug_amount desc
+        limit {limit}
+    """
+
+    result = await session.execute(text(query_string))
+
+    popular_drugs: list[UsedDrug] = []
+
+    for i in result:
+        d = await session.get(DrugOrm, ident=i[0])
+
+        popular_drugs.append(UsedDrug(
+            drug=Drug.model_validate(d),
+            uses_number=i[1]
+        ))
+
+    return popular_drugs
 
 
 @router.get("/critical-amount")
