@@ -6,14 +6,7 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from db import get_session
-from models import (
-    DrugOrm,
-    DrugTypeOrm,
-    PatientOrm,
-    DoctorOrm,
-    CustomerOrm,
-    OrderOrm
-)
+from models import DrugOrm, DrugTypeOrm, PatientOrm, DoctorOrm, CustomerOrm, OrderOrm
 from schemas import (
     FrequentCustomer,
     CustomerOrder,
@@ -29,10 +22,7 @@ from schemas import (
     Technology,
     Prescription,
 )
-from schemas.responses import (
-    CreateOrderResponse,
-    BaseResponse
-)
+from schemas.responses import CreateOrderResponse, BaseResponse
 
 app = FastAPI()
 
@@ -99,49 +89,49 @@ async def get_customers(session: AsyncSession = Depends(get_session)) -> list[Cu
     return [Customer.model_validate(i) for i in result.scalars().all()]
 
 
-@app.get("/forgotten-orders")
+@app.get("/orders/forgotten")
 async def get_forgotten_orders() -> list[CustomerOrder]:
     return []
 
 
-@app.get("/waiting-supplies-customers")
+@app.get("/customers/waiting-supplies")
 async def get_waiting_supplies_customers(drug_type_id: Optional[int] = None) -> list[Customer]:
     return []
 
 
-@app.get("/popular-drugs")
+@app.get("/drugs/popular")
 async def get_popular_drugs(limit: int = 10, drug_type_id: Optional[int] = None) -> list[UsedDrug]:
     return []
 
 
-@app.get("/used-drugs")
+@app.get("/drugs/used")
 async def get_used_drugs(period_start: date, period_end: date) -> list[UsedDrug]:
     return []
 
 
-@app.get("/ordered-something-customers")
+@app.get("/customers/ordered-something")
 async def get_ordered_something_customers(
-        period_start: date, period_end: date, drug_id: Optional[int] = None, drug_type_id: Optional[int] = None
+    period_start: date, period_end: date, drug_id: Optional[int] = None, drug_type_id: Optional[int] = None
 ) -> list[Customer]:
     return []
 
 
-@app.get("/critical-amount-drugs")
+@app.get("/drugs/critical-amount")
 async def get_critical_amount_drugs() -> list[Drug]:
     return []
 
 
-@app.get("/critical-amount-drug-types")
+@app.get("/drug-types/critical-amount")
 async def get_critical_amount_drug_types() -> list[DrugType]:
     return []
 
 
-@app.get("/minimal-amount-drugs")
+@app.get("/drugs/minimal-amount")
 async def get_minimal_amount_drugs(drug_type_id: Optional[int] = None) -> list[StoredDrug]:
     return []
 
 
-@app.get("/orders-in-production")
+@app.get("/orders/production")
 async def get_orders_in_production() -> list[Order]:
     return []
 
@@ -153,13 +143,13 @@ async def get_production_components() -> list[TechnologyComponent]:
 
 @app.get("/technologies")
 async def get_technologies(
-        drug_id: Optional[int] = None, drug_type_id: Optional[int] = None, in_production: bool = False
+    drug_id: Optional[int] = None, drug_type_id: Optional[int] = None, in_production: bool = False
 ) -> list[Technology]:
     return []
 
 
-@app.get("/frequent-customers")
+@app.get("/customers/frequent")
 async def get_frequent_customers(
-        drug_id: Optional[int] = None, drug_type_id: Optional[int] = None
+    drug_id: Optional[int] = None, drug_type_id: Optional[int] = None
 ) -> list[FrequentCustomer]:
     return []
