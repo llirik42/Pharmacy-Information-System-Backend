@@ -114,5 +114,64 @@ async def get_minimal_amount_drugs(drug_type_id: Optional[int] = None, session: 
 
 
 @router.get("/used")
-async def get_used_drugs(period_start: date, period_end: date) -> list[UsedDrug]:
-    return []
+async def get_used_drugs(period_start: date, period_end: date, session: AsyncSession = Depends(get_session)) -> list[UsedDrug]:
+    s1 = f"'{str(period_start).replace('-', '/')}'"
+    s2 = f"'{str(period_end).replace('-', '/')}'"
+
+    query = text(
+        f"""
+            with
+                used_in_cooking_drugs as (
+                    select
+                        component_id as drug_id,
+                        sum(component_amount) as drug_amount
+                    from production
+                        join technology_components on production.technology_id = technology_components.technology_id
+                        join drugs on technology_components.component_id = drugs.id
+                    where start between {s1} and {s2}
+                    group by component_id
+                ),
+        
+                sold_drugs as (
+                    select
+                        drug_id,
+                        sum(amount) as drug_amount
+                    from orders
+                        join prescriptions_content using (prescription_id)
+                    where obtaining_datetime between {s1} and {s2}
+                    group by drug_id
+                ),
+        
+                used_drugs as (
+                    select
+                        drug_id,
+                        drugs.name,
+                        sum(drug_amount) as drug_amount
+                    from (
+                        select *
+                        from used_in_cooking_drugs
+                        union all
+                        select *
+                        from sold_drugs
+                        ) as _
+                        join drugs on drug_id = drugs.id
+                    group by drug_id)
+        
+            select drug_id, drug_amount
+            from used_drugs
+            order by drug_amount desc
+        """
+    )
+
+    result = await session.execute(query)
+
+    used_drugs: list[UsedDrug] = []
+
+    for i in result:
+        d = await session.get(DrugOrm, ident=i[0])
+        used_drugs.append(UsedDrug(
+            drug=Drug.model_validate(d),
+            uses_number=i[1]
+        ))
+
+    return used_drugs

@@ -1,7 +1,9 @@
 from pydantic import Field
 
-from schemas.base.drug import Drug
+from .base.base import Base
+from .base.drug import Drug
 
 
-class UsedDrug(Drug):
+class UsedDrug(Base):
+    drug: Drug
     uses_number: int = Field(ge=0)
