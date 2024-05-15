@@ -1,11 +1,6 @@
-from pydantic import Field
-
-from .administration_route import AdministrationRoute
-from .base import Base
+from .abstract_prescription_item import AbstractPrescriptionItem
 from .drug import Drug
 
 
-class PrescriptionItem(Base):
+class PrescriptionItem(AbstractPrescriptionItem):
     drug: Drug
-    amount: int = Field(ge=1)
-    administration_route: AdministrationRoute
