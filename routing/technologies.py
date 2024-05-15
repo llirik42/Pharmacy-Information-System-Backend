@@ -13,10 +13,10 @@ router = APIRouter(prefix="/technologies")
 
 @router.get("/")
 async def get_technologies(
-    drug_id: Optional[int] = None,
-    drug_type_id: Optional[int] = None,
-    in_production: bool = False,
-    session: AsyncSession = Depends(get_session),
+        drug_id: Optional[int] = None,
+        drug_type_id: Optional[int] = None,
+        in_production: bool = False,
+        session: AsyncSession = Depends(get_session),
 ) -> list[Technology]:
     query = text(
         _get_technologies_query_string(drug_id=drug_id, drug_type_id=drug_type_id, in_production=in_production)
@@ -34,7 +34,7 @@ async def get_technologies(
 
 
 def _get_technologies_query_string(
-    drug_id: Optional[int] = None, drug_type_id: Optional[int] = None, in_production: bool = False
+        drug_id: Optional[int] = None, drug_type_id: Optional[int] = None, in_production: bool = False
 ) -> str:
     if drug_id is not None and in_production:
         return f"""

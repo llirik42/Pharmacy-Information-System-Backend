@@ -1,3 +1,6 @@
+from datetime import datetime
+from typing import Optional
+
 from fastapi import APIRouter, Depends
 from sqlalchemy import text, select
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -11,7 +14,10 @@ router = APIRouter(prefix="/orders")
 
 
 @router.post("/")
-async def create_order(prescription: Prescription) -> CreateOrderResponse:
+async def create_order(
+        prescription: Prescription, session: AsyncSession = Depends(get_session)
+) -> CreateOrderResponse:
+    # TODO: implement
     return CreateOrderResponse(is_customer_required=True, order_id=0)
 
 
@@ -68,15 +74,62 @@ async def get_orders_in_production(session: AsyncSession = Depends(get_session))
 
 
 @router.post("/{order_id}/customers")
-async def add_order_customer(order_id: int, customer: Customer) -> BaseResponse:
-    return BaseResponse()
+async def set_order_customer(
+    order_id: int, customer: Customer, session: AsyncSession = Depends(get_session)
+) -> BaseResponse:
+    pass
+    # TODO: implement
 
 
 @router.post("/{order_id}/pay")
-async def pay_for_order() -> BaseResponse:
-    return BaseResponse()
+async def pay_for_order(order_id: int, session: AsyncSession = Depends(get_session)) -> BaseResponse:
+    order: Optional[OrderOrm] = await session.get(OrderOrm, ident=order_id)
+
+    if order is None:
+        return BaseResponse(
+            is_success=False,
+            message=f"Order {order_id} not found",
+        )
+
+    if order.paid:
+        return BaseResponse(
+            is_success=False,
+            message=f"Order {order_id} is already paid",
+        )
+
+    try:
+        order.paid = True
+        await session.commit()
+        return BaseResponse()
+    except Exception:
+        return BaseResponse(
+            is_success=False,
+            message="Internal error",
+        )
 
 
 @router.post("/{order_id}/obtain")
-async def obtain_order() -> BaseResponse:
-    return BaseResponse()
+async def obtain_order(order_id: int, session: AsyncSession = Depends(get_session)) -> BaseResponse:
+    order: Optional[OrderOrm] = await session.get(OrderOrm, ident=order_id)
+
+    if order is None:
+        return BaseResponse(
+            is_success=False,
+            message=f"Order {order_id} not found",
+        )
+
+    if order.obtaining_datetime is not None:
+        return BaseResponse(
+            is_success=False,
+            message=f"Order {order_id} is already obtained",
+        )
+
+    try:
+        order.obtaining_datetime = datetime.now()
+        await session.commit()
+        return BaseResponse()
+    except Exception:
+        return BaseResponse(
+            is_success=False,
+            message="Internal error",
+        )

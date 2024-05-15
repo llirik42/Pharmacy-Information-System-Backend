@@ -21,7 +21,7 @@ async def get_customers(session: AsyncSession = Depends(get_session)) -> list[Cu
 
 @router.get("/waiting-supplies")
 async def get_waiting_supplies_customers(
-    drug_type_id: Optional[int] = None, session: AsyncSession = Depends(get_session)
+        drug_type_id: Optional[int] = None, session: AsyncSession = Depends(get_session)
 ) -> list[Customer]:
     tmp = "" if drug_type_id is None else f"drugs.type_id = {drug_type_id} and"
 
@@ -48,11 +48,11 @@ async def get_waiting_supplies_customers(
 
 @router.get("/ordered-something")
 async def get_ordered_something_customers(
-    period_start: date,
-    period_end: date,
-    drug_id: Optional[int] = None,
-    drug_type_id: Optional[int] = None,
-    session: AsyncSession = Depends(get_session),
+        period_start: date,
+        period_end: date,
+        drug_id: Optional[int] = None,
+        drug_type_id: Optional[int] = None,
+        session: AsyncSession = Depends(get_session),
 ) -> list[Customer]:
     query = text(
         _get_ordered_something_customers_query_string(
@@ -72,7 +72,7 @@ async def get_ordered_something_customers(
 
 @router.get("/frequent")
 async def get_frequent_customers(
-    drug_id: Optional[int] = None, drug_type_id: Optional[int] = None, session: AsyncSession = Depends(get_session)
+        drug_id: Optional[int] = None, drug_type_id: Optional[int] = None, session: AsyncSession = Depends(get_session)
 ) -> list[FrequentCustomer]:
     query = text(_get_frequent_customers_query_string(drug_id=drug_id, drug_type_id=drug_type_id))
     result = await session.execute(query)
@@ -94,7 +94,7 @@ async def get_frequent_customers(
 
 
 def _get_ordered_something_customers_query_string(
-    period_start: date, period_end: date, drug_id: Optional[int] = None, drug_type_id: Optional[int] = None
+        period_start: date, period_end: date, drug_id: Optional[int] = None, drug_type_id: Optional[int] = None
 ) -> str:
     s1 = f"'{str(period_start).replace('-', '/')}'"
     s2 = f"'{str(period_end).replace('-', '/')}'"
