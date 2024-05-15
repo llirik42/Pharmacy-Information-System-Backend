@@ -17,6 +17,4 @@ class OrderOrm(Base):
     obtaining_datetime: Mapped[datetime] = mapped_column(nullable=True)
     paid: Mapped[bool] = mapped_column(default=False)
     customer_id: Mapped[int] = mapped_column(ForeignKey("customers.id"), nullable=True)
-    prescription: Mapped[PrescriptionOrm] = relationship(
-        lazy="joined"
-    )
+    prescription: Mapped[PrescriptionOrm] = relationship(lazy="joined")
