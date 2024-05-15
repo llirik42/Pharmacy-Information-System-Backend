@@ -20,7 +20,9 @@ async def get_customers(session: AsyncSession = Depends(get_session)) -> list[Cu
 
 
 @router.get("/waiting-supplies")
-async def get_waiting_supplies_customers(drug_type_id: Optional[int] = None, session: AsyncSession = Depends(get_session)) -> list[Customer]:
+async def get_waiting_supplies_customers(
+    drug_type_id: Optional[int] = None, session: AsyncSession = Depends(get_session)
+) -> list[Customer]:
     tmp = "" if drug_type_id is None else f"drugs.type_id = {drug_type_id} and"
 
     query_string = f"""
@@ -46,14 +48,17 @@ async def get_waiting_supplies_customers(drug_type_id: Optional[int] = None, ses
 
 @router.get("/ordered-something")
 async def get_ordered_something_customers(
-    period_start: date, period_end: date, drug_id: Optional[int] = None, drug_type_id: Optional[int] = None, session: AsyncSession = Depends(get_session)
+    period_start: date,
+    period_end: date,
+    drug_id: Optional[int] = None,
+    drug_type_id: Optional[int] = None,
+    session: AsyncSession = Depends(get_session),
 ) -> list[Customer]:
-    query = text(_get_ordered_something_customers_query_string(
-        period_start=period_start,
-        period_end=period_end,
-        drug_id=drug_id,
-        drug_type_id=drug_type_id
-    ))
+    query = text(
+        _get_ordered_something_customers_query_string(
+            period_start=period_start, period_end=period_end, drug_id=drug_id, drug_type_id=drug_type_id
+        )
+    )
     result = await session.execute(query)
 
     customers: list[Customer] = []
@@ -67,9 +72,7 @@ async def get_ordered_something_customers(
 
 @router.get("/frequent")
 async def get_frequent_customers(
-    drug_id: Optional[int] = None,
-    drug_type_id: Optional[int] = None,
-    session: AsyncSession = Depends(get_session)
+    drug_id: Optional[int] = None, drug_type_id: Optional[int] = None, session: AsyncSession = Depends(get_session)
 ) -> list[FrequentCustomer]:
     query = text(_get_frequent_customers_query_string(drug_id=drug_id, drug_type_id=drug_type_id))
     result = await session.execute(query)
@@ -80,15 +83,19 @@ async def get_frequent_customers(
         q = await session.get(CustomerOrm, ident=row[0])
         c = Customer.model_validate(q)
 
-        customers.append(FrequentCustomer(
-            customer=c,
-            orders_count=row[1],
-        ))
+        customers.append(
+            FrequentCustomer(
+                customer=c,
+                orders_count=row[1],
+            )
+        )
 
     return customers
 
 
-def _get_ordered_something_customers_query_string(period_start: date, period_end: date, drug_id: Optional[int] = None, drug_type_id: Optional[int] = None) -> str:
+def _get_ordered_something_customers_query_string(
+    period_start: date, period_end: date, drug_id: Optional[int] = None, drug_type_id: Optional[int] = None
+) -> str:
     s1 = f"'{str(period_start).replace('-', '/')}'"
     s2 = f"'{str(period_end).replace('-', '/')}'"
 
@@ -128,8 +135,7 @@ def _get_ordered_something_customers_query_string(period_start: date, period_end
     """
 
 
-def _get_frequent_customers_query_string(drug_id: Optional[int] = None,
-                                         drug_type_id: Optional[int] = None) -> str:
+def _get_frequent_customers_query_string(drug_id: Optional[int] = None, drug_type_id: Optional[int] = None) -> str:
     if drug_id is not None:
         return f"""
             select

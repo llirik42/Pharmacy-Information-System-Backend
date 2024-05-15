@@ -20,7 +20,9 @@ async def get_drugs(session: AsyncSession = Depends(get_session)) -> list[Drug]:
 
 
 @router.get("/popular")
-async def get_popular_drugs(limit: int = 10, drug_type_id: Optional[int] = None, session: AsyncSession = Depends(get_session)) -> list[UsedDrug]:
+async def get_popular_drugs(
+    limit: int = 10, drug_type_id: Optional[int] = None, session: AsyncSession = Depends(get_session)
+) -> list[UsedDrug]:
     tmp = "" if drug_type_id is None else f"where type_id = {drug_type_id}"
 
     query_string = f"""
@@ -75,10 +77,7 @@ async def get_popular_drugs(limit: int = 10, drug_type_id: Optional[int] = None,
     for i in result:
         d = await session.get(DrugOrm, ident=i[0])
 
-        popular_drugs.append(UsedDrug(
-            drug=Drug.model_validate(d),
-            uses_number=i[1]
-        ))
+        popular_drugs.append(UsedDrug(drug=Drug.model_validate(d), uses_number=i[1]))
 
     return popular_drugs
 
@@ -121,7 +120,9 @@ async def get_critical_amount_drugs(session: AsyncSession = Depends(get_session)
 
 
 @router.get("/minimal-amount")
-async def get_minimal_amount_drugs(drug_type_id: Optional[int] = None, session: AsyncSession = Depends(get_session)) -> list[StoredDrug]:
+async def get_minimal_amount_drugs(
+    drug_type_id: Optional[int] = None, session: AsyncSession = Depends(get_session)
+) -> list[StoredDrug]:
     tmp = "" if drug_type_id is None else f"where type_id = {drug_type_id}"
 
     query_s = f"""
@@ -164,16 +165,15 @@ async def get_minimal_amount_drugs(drug_type_id: Optional[int] = None, session: 
     for i in result:
         res = await session.get(DrugOrm, ident=i[0])
         drug = Drug.model_validate(res)
-        drugs.append(StoredDrug(
-            drug=drug,
-            stored_count=i[1]
-        ))
+        drugs.append(StoredDrug(drug=drug, stored_count=i[1]))
 
     return drugs
 
 
 @router.get("/used")
-async def get_used_drugs(period_start: date, period_end: date, session: AsyncSession = Depends(get_session)) -> list[UsedDrug]:
+async def get_used_drugs(
+    period_start: date, period_end: date, session: AsyncSession = Depends(get_session)
+) -> list[UsedDrug]:
     s1 = f"'{str(period_start).replace('-', '/')}'"
     s2 = f"'{str(period_end).replace('-', '/')}'"
 
@@ -228,9 +228,6 @@ async def get_used_drugs(period_start: date, period_end: date, session: AsyncSes
 
     for i in result:
         d = await session.get(DrugOrm, ident=i[0])
-        used_drugs.append(UsedDrug(
-            drug=Drug.model_validate(d),
-            uses_number=i[1]
-        ))
+        used_drugs.append(UsedDrug(drug=Drug.model_validate(d), uses_number=i[1]))
 
     return used_drugs

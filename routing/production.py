@@ -29,9 +29,11 @@ async def get_production_components(session: AsyncSession = Depends(get_session)
 
     for i in result:
         drug_res = await session.get(DrugOrm, ident=i[0])
-        components.append(TechnologyComponent(
-            component=Drug.model_validate(drug_res),
-            component_amount=i[1],
-        ))
+        components.append(
+            TechnologyComponent(
+                component=Drug.model_validate(drug_res),
+                component_amount=i[1],
+            )
+        )
 
     return components
