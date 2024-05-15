@@ -6,4 +6,4 @@ from .drug import Drug
 
 class TechnologyComponent(Base):
     component: Drug
-    component_amount: Drug = Field(ge=1)
+    component_amount: int = Field(ge=1)
