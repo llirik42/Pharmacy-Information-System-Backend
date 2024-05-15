@@ -1,11 +1,10 @@
 from pydantic import Field
 
-from .base import Base
 from .drug_type import DrugType
+from .short_drug import ShortDrug
 
 
-class Drug(Base):
-    name: str = Field(max_length=256)
+class Drug(ShortDrug):
     cost: int = Field(ge=1)
     shelf_life: int = Field(ge=1)
     critical_amount: int = Field(ge=0)
