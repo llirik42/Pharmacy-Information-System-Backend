@@ -2,7 +2,7 @@ from datetime import date
 from typing import Optional
 
 from fastapi import APIRouter, Depends
-from sqlalchemy import select
+from sqlalchemy import select, text
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from db import get_session
@@ -25,8 +25,40 @@ async def get_popular_drugs(limit: int = 10, drug_type_id: Optional[int] = None)
 
 
 @router.get("/critical-amount")
-async def get_critical_amount_drugs() -> list[Drug]:
-    return []
+async def get_critical_amount_drugs(session: AsyncSession = Depends(get_session)) -> list[Drug]:
+    query = text(
+        """
+        with
+            critical_amount_drugs as (
+                select
+                    drugs.id as drug_id,
+                    drugs.name as drug_name,
+                    coalesce(sum(available_amount), 0) as drug_amount,
+                    critical_amount
+                from drugs
+                    left join storage_items on drugs.id = storage_items.drug_id
+                group by
+                    drugs.id,
+                    critical_amount
+                having
+                    drug_amount <= critical_amount
+            )
+        
+        select drug_id, drug_amount
+        from critical_amount_drugs
+        order by drug_amount
+        """
+    )
+
+    result = await session.execute(query)
+
+    drugs: list[Drug] = []
+
+    for i in result:
+        drug_res = await session.get(DrugOrm, ident=i[0])
+        drugs.append(Drug.model_validate(drug_res))
+
+    return drugs
 
 
 @router.get("/minimal-amount")
