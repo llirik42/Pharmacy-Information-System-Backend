@@ -23,15 +23,37 @@ async def get_orders(session: AsyncSession = Depends(get_session)) -> list[Order
 
 
 @router.get("/forgotten")
-async def get_forgotten_orders() -> list[CustomerOrder]:
-    return []
+async def get_forgotten_orders(session: AsyncSession = Depends(get_session)) -> list[CustomerOrder]:
+    query = text(
+        """
+        select distinct
+            id as order_id
+        from orders
+        where
+            appointed_datetime is not null
+            and appointed_datetime <= now()
+            and (
+                obtaining_datetime is null
+                or obtaining_datetime <> appointed_datetime
+            )
+        """
+    )
+
+    result = await session.execute(query)
+    customer_orders: list[CustomerOrder] = []
+
+    for i in result:
+        order_id: int = i[0]
+        customer_order = await session.get(OrderOrm, ident=order_id)
+        customer_orders.append(CustomerOrder.model_validate(customer_order))
+
+    return customer_orders
 
 
 @router.get("/production")
 async def get_orders_in_production(session: AsyncSession = Depends(get_session)) -> list[Order]:
     query = text("select distinct order_id from production")
     result = await session.execute(query)
-    print(result.all())
     return []
 
 
