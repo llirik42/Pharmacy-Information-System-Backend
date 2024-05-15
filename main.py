@@ -11,7 +11,8 @@ from models import (
     DrugTypeOrm,
     PatientOrm,
     DoctorOrm,
-    CustomerOrm
+    CustomerOrm,
+    OrderOrm
 )
 from schemas import (
     FrequentCustomer,
@@ -36,9 +37,16 @@ from schemas.responses import (
 app = FastAPI()
 
 
+@app.get("/orders")
+async def get_orders(session: AsyncSession = Depends(get_session)) -> list[Order]:
+    query = select(OrderOrm)
+    result = await session.execute(query)
+    return [Order.model_validate(i) for i in result.unique().scalars().all()]
+
+
 @app.post("/orders")
 async def create_order(prescription: Prescription) -> CreateOrderResponse:
-    return CreateOrderResponse(is_customer_required=True, order_id=12)
+    return CreateOrderResponse(is_customer_required=True, order_id=0)
 
 
 @app.post("/orders/{order_id}/customers")
@@ -113,7 +121,7 @@ async def get_used_drugs(period_start: date, period_end: date) -> list[UsedDrug]
 
 @app.get("/ordered-something-customers")
 async def get_ordered_something_customers(
-    period_start: date, period_end: date, drug_id: Optional[int] = None, drug_type_id: Optional[int] = None
+        period_start: date, period_end: date, drug_id: Optional[int] = None, drug_type_id: Optional[int] = None
 ) -> list[Customer]:
     return []
 
@@ -145,13 +153,13 @@ async def get_production_components() -> list[TechnologyComponent]:
 
 @app.get("/technologies")
 async def get_technologies(
-    drug_id: Optional[int] = None, drug_type_id: Optional[int] = None, in_production: bool = False
+        drug_id: Optional[int] = None, drug_type_id: Optional[int] = None, in_production: bool = False
 ) -> list[Technology]:
     return []
 
 
 @app.get("/frequent-customers")
 async def get_frequent_customers(
-    drug_id: Optional[int] = None, drug_type_id: Optional[int] = None
+        drug_id: Optional[int] = None, drug_type_id: Optional[int] = None
 ) -> list[FrequentCustomer]:
     return []

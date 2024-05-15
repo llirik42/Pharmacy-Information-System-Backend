@@ -1,7 +1,9 @@
 from sqlalchemy import ForeignKey, CheckConstraint
-from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 
+from .administration_route import AdministrationRouteOrm
 from .base import Base
+from .drug import DrugOrm
 
 
 class PrescriptionItemOrm(Base):
@@ -11,3 +13,9 @@ class PrescriptionItemOrm(Base):
     drug_id: Mapped[int] = mapped_column(ForeignKey("drugs.id"), primary_key=True)
     amount: Mapped[int] = mapped_column(CheckConstraint("amount > 0"))
     administration_route_id: Mapped[int] = mapped_column(ForeignKey("administration_routes.id"), primary_key=True)
+    drug: Mapped[DrugOrm] = relationship(
+        lazy="joined",
+    )
+    administration_route: Mapped[AdministrationRouteOrm] = relationship(
+        lazy="joined",
+    )

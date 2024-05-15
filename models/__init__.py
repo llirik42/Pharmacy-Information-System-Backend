@@ -46,7 +46,7 @@ from .patient import PatientOrm
 from .pill import PillOrm
 from .powder import PowderOrm
 from .prescription import PrescriptionOrm
-from .prescription_content import PrescriptionItemOrm
+from .prescription_item import PrescriptionItemOrm
 from .production import ProductionOrm
 from .production_lab_worker import ProductionLabWorkerOrm
 from .reserved_drug import ReservedDrugOrm

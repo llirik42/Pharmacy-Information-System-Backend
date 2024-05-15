@@ -1,9 +1,10 @@
 from datetime import datetime
 
 from sqlalchemy import ForeignKey
-from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from .base import Base
+from .prescription import PrescriptionOrm
 
 
 class OrderOrm(Base):
@@ -16,3 +17,6 @@ class OrderOrm(Base):
     obtaining_datetime: Mapped[datetime] = mapped_column(nullable=True)
     paid: Mapped[bool] = mapped_column(default=False)
     customer_id: Mapped[int] = mapped_column(ForeignKey("customers.id"), nullable=True)
+    prescription: Mapped[PrescriptionOrm] = relationship(
+        lazy="joined"
+    )

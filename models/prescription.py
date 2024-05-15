@@ -1,9 +1,12 @@
 from datetime import date
 
 from sqlalchemy import String, ForeignKey, UniqueConstraint, Date
-from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from .base import Base
+from .doctor import DoctorOrm
+from .patient import PatientOrm
+from .prescription_item import PrescriptionItemOrm
 
 
 class PrescriptionOrm(Base):
@@ -14,5 +17,14 @@ class PrescriptionOrm(Base):
     patient_id: Mapped[int] = mapped_column(ForeignKey("patients.id"))
     doctor_id: Mapped[int] = mapped_column(ForeignKey("doctors.id"))
     date: Mapped[date] = mapped_column(Date())
+    items: Mapped[list[PrescriptionItemOrm]] = relationship(
+        lazy="joined",
+    )
+    patient: Mapped[PatientOrm] = relationship(
+        lazy="joined",
+    )
+    doctor: Mapped[DoctorOrm] = relationship(
+        lazy="joined",
+    )
 
     __table_args__ = (UniqueConstraint("diagnosis", "patient_id", "doctor_id", "date"),)

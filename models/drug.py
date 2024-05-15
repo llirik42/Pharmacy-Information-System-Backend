@@ -16,6 +16,5 @@ class DrugOrm(Base):
     type_id: Mapped[int] = mapped_column(ForeignKey("drug_types.id"))
     description: Mapped[str] = mapped_column(String(256))
     drug_type: Mapped[DrugTypeOrm] = relationship(
-        single_parent=True,
         lazy="joined"
     )
