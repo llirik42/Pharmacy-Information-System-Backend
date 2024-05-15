@@ -73,10 +73,10 @@ async def add_order_customer(order_id: int, customer: Customer) -> BaseResponse:
 
 
 @router.post("/{order_id}/pay")
-async def add_order_customer() -> BaseResponse:
+async def pay_for_order() -> BaseResponse:
     return BaseResponse()
 
 
 @router.post("/{order_id}/obtain")
-async def add_order_customer() -> BaseResponse:
+async def obtain_order() -> BaseResponse:
     return BaseResponse()
