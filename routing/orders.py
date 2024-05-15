@@ -52,9 +52,19 @@ async def get_forgotten_orders(session: AsyncSession = Depends(get_session)) -> 
 
 @router.get("/production")
 async def get_orders_in_production(session: AsyncSession = Depends(get_session)) -> list[Order]:
-    query = text("select distinct order_id from production")
+    query = text(
+        """
+        select distinct order_id from production
+        """
+    )
     result = await session.execute(query)
-    return []
+
+    orders: list[Order] = []
+
+    for i in result:
+        orders.append(Order.model_validate(await session.get(OrderOrm, ident=i[0])))
+
+    return orders
 
 
 @router.post("/{order_id}/customers")
