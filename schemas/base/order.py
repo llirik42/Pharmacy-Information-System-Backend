@@ -1,13 +1,14 @@
 from datetime import datetime
 from typing import Optional
 
-from pydantic import BaseModel, Field
+from pydantic import Field
 
+from .base import Base
 from .customer import Customer
 from .prescription import Prescription
 
 
-class Order(BaseModel):
+class Order(Base):
     prescription: Prescription
     registration_datetime: datetime
     appointed_datetime: Optional[datetime] = None

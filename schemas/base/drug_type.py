@@ -1,6 +1,8 @@
-from pydantic import BaseModel, Field
+from pydantic import Field
+
+from .base import Base
 
 
-class DrugType(BaseModel):
+class DrugType(Base):
     name: str = Field(max_length=256)
-    cookable: bool
+    is_cookable: bool = Field(validation_alias='cookable')

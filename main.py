@@ -1,8 +1,18 @@
 from datetime import date
 from typing import Optional
 
-from fastapi import FastAPI
+from fastapi import FastAPI, Depends
+from sqlalchemy import select
+from sqlalchemy.ext.asyncio import AsyncSession
 
+from db import get_session
+from models import (
+    DrugOrm,
+    DrugTypeOrm,
+    PatientOrm,
+    DoctorOrm,
+    CustomerOrm
+)
 from schemas import (
     FrequentCustomer,
     CustomerOrder,
@@ -22,28 +32,38 @@ app = FastAPI()
 
 
 @app.get("/drugs")
-async def get_drugs() -> list[Drug]:
-    return []
+async def get_drugs(session: AsyncSession = Depends(get_session)) -> list[Drug]:
+    query = select(DrugOrm)
+    result = await session.execute(query)
+    return [Drug.model_validate(i) for i in result.scalars().all()]
 
 
 @app.get("/drug-types")
-async def get_drug_types() -> list[DrugType]:
-    return []
+async def get_drug_types(session: AsyncSession = Depends(get_session)) -> list[DrugType]:
+    query = select(DrugTypeOrm)
+    result = await session.execute(query)
+    return [DrugType.model_validate(i) for i in result.scalars().all()]
 
 
 @app.get("/doctors")
-async def get_doctors() -> list[Doctor]:
-    return []
+async def get_doctors(session: AsyncSession = Depends(get_session)) -> list[Doctor]:
+    query = select(DoctorOrm)
+    result = await session.execute(query)
+    return [Doctor.model_validate(i) for i in result.scalars().all()]
 
 
 @app.get("/patients")
-async def get_patients() -> list[Patient]:
-    return []
+async def get_patients(session: AsyncSession = Depends(get_session)) -> list[Patient]:
+    query = select(PatientOrm)
+    result = await session.execute(query)
+    return [Patient.model_validate(i) for i in result.scalars().all()]
 
 
 @app.get("/customers")
-async def get_customers() -> list[Customer]:
-    return []
+async def get_customers(session: AsyncSession = Depends(get_session)) -> list[Customer]:
+    query = select(CustomerOrm)
+    result = await session.execute(query)
+    return [Customer.model_validate(i) for i in result.scalars().all()]
 
 
 @app.get("/forgotten-orders")

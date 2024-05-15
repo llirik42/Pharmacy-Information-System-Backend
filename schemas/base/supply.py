@@ -5,9 +5,10 @@ from pydantic import BaseModel, Field
 
 from .drug import Drug
 from .supplier import Supplier
+from .base import Base
 
 
-class Supply(BaseModel):
+class Supply(Base):
     drug: Drug
     drug_amount: int = Field(ge=1)
     cost: int = Field(ge=0)

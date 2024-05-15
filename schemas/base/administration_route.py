@@ -1,5 +1,7 @@
-from pydantic import BaseModel, Field
+from pydantic import Field
+
+from .base import Base
 
 
-class AdministrationRoute(BaseModel):
+class AdministrationRoute(Base):
     description: str = Field(max_length=256)
