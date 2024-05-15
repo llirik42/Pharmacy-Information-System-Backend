@@ -15,7 +15,6 @@ class DrugOrm(Base):
     critical_amount: Mapped[int] = mapped_column(CheckConstraint("critical_amount >= 0"))
     type_id: Mapped[int] = mapped_column(ForeignKey("drug_types.id"))
     description: Mapped[str] = mapped_column(String(256))
-
     drug_type: Mapped[DrugTypeOrm] = relationship(
         single_parent=True,
         lazy="joined"
