@@ -3,4 +3,4 @@ from .short_prescription_item import ShortPrescriptionItem
 
 
 class ShortPrescription(AbstractPrescription):
-    items: ShortPrescriptionItem
+    items: [ShortPrescriptionItem]

@@ -3,4 +3,4 @@ from .prescription_item import PrescriptionItem
 
 
 class Prescription(AbstractPrescription):
-    items: PrescriptionItem
+    items: list[PrescriptionItem]
