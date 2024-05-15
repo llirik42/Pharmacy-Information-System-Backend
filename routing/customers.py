@@ -1,18 +1,13 @@
 from datetime import date
-from http import HTTPStatus
 from typing import Optional
 
 from fastapi import APIRouter, Depends
 from sqlalchemy import select, text
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy.orm import session
 
 from db import get_session
 from models import CustomerOrm
 from schemas import Customer, FrequentCustomer
-
-from fastapi import status
-from fastapi.exceptions import HTTPException
 
 router = APIRouter(prefix="/customers")
 
@@ -25,8 +20,28 @@ async def get_customers(session: AsyncSession = Depends(get_session)) -> list[Cu
 
 
 @router.get("/waiting-supplies")
-async def get_waiting_supplies_customers(drug_type_id: Optional[int] = None) -> list[Customer]:
-    return []
+async def get_waiting_supplies_customers(drug_type_id: Optional[int] = None, session: AsyncSession = Depends(get_session)) -> list[Customer]:
+    tmp = "" if drug_type_id is None else f"drugs.type_id = {drug_type_id} and"
+
+    query_string = f"""
+        select distinct
+            customer_id
+        from orders
+            join orders_waiting_drug_supplies on orders.id = orders_waiting_drug_supplies.order_id
+            join drugs on orders_waiting_drug_supplies.drug_id = drugs.id
+        where {tmp} customer_id is not null
+    """
+
+    query = text(query_string)
+    result = await session.execute(query)
+
+    customers: list[Customer] = []
+
+    for i in result:
+        c = await session.get(CustomerOrm, ident=i[0])
+        customers.append(Customer.model_validate(c))
+
+    return customers
 
 
 @router.get("/ordered-something")
