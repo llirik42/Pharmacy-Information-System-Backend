@@ -19,9 +19,6 @@ __all__ = [
     "UsedDrug",
     "StoredDrug",
     "CustomerOrder",
-    "ShortDrug",
-    "ShortPrescription",
-    "ShortPrescriptionItem",
 ]
 
 from .base.administration_route import AdministrationRoute
@@ -36,9 +33,6 @@ from .base.patient import Patient
 from .base.prescription import Prescription
 from .base.prescription_item import PrescriptionItem
 from .base.production import Production
-from .base.short_drug import ShortDrug
-from .base.short_prescription import ShortPrescription
-from .base.short_prescription_item import ShortPrescriptionItem
 from .base.storage_item import StorageItem
 from .base.supplier import Supplier
 from .base.supply import Supply

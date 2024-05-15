@@ -26,9 +26,34 @@ from schemas import (
     StoredDrug,
     TechnologyComponent,
     Technology,
+    Prescription,
+)
+from schemas.responses import (
+    CreateOrderResponse,
+    BaseResponse
 )
 
 app = FastAPI()
+
+
+@app.post("/orders")
+async def create_order(prescription: Prescription) -> CreateOrderResponse:
+    return CreateOrderResponse(is_customer_required=True, order_id=12)
+
+
+@app.post("/orders/{order_id}/customers")
+async def add_order_customer(order_id: int, customer: Customer) -> BaseResponse:
+    return BaseResponse()
+
+
+@app.post("/orders/{order_id}/pay")
+async def add_order_customer() -> BaseResponse:
+    return BaseResponse()
+
+
+@app.post("/orders/{order_id}/obtain")
+async def add_order_customer() -> BaseResponse:
+    return BaseResponse()
 
 
 @app.get("/drugs")

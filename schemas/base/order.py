@@ -9,6 +9,7 @@ from .prescription import Prescription
 
 
 class Order(Base):
+    id: int
     prescription: Prescription
     registration_datetime: datetime
     appointed_datetime: Optional[datetime] = None
