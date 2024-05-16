@@ -14,9 +14,7 @@ router = APIRouter(prefix="/orders")
 
 
 @router.post("/")
-async def create_order(
-        prescription: Prescription, session: AsyncSession = Depends(get_session)
-) -> CreateOrderResponse:
+async def create_order(prescription: Prescription, session: AsyncSession = Depends(get_session)) -> CreateOrderResponse:
     # TODO: implement
     return CreateOrderResponse(is_customer_required=True, order_id=0)
 

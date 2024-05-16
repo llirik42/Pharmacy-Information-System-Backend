@@ -19,6 +19,7 @@ __all__ = [
     "UsedDrug",
     "StoredDrug",
     "CustomerOrder",
+    "ProductionComponent",
 ]
 
 from .base.administration_route import AdministrationRoute
@@ -40,5 +41,6 @@ from .base.technology import Technology
 from .base.technology_component import TechnologyComponent
 from .customer_order import CustomerOrder
 from .frequent_customer import FrequentCustomer
+from .production_component import ProductionComponent
 from .stored_drug import StoredDrug
 from .used_drug import UsedDrug

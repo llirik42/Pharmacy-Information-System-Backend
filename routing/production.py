@@ -4,13 +4,13 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from db import get_session
 from models import DrugOrm
-from schemas import TechnologyComponent, Drug
+from schemas import ProductionComponent, Drug
 
 router = APIRouter(prefix="/production")
 
 
 @router.get("/components")
-async def get_production_components(session: AsyncSession = Depends(get_session)) -> list[TechnologyComponent]:
+async def get_production_components(session: AsyncSession = Depends(get_session)) -> list[ProductionComponent]:
     query = text(
         """
         select
@@ -25,12 +25,12 @@ async def get_production_components(session: AsyncSession = Depends(get_session)
 
     result = await session.execute(query)
 
-    components: list[TechnologyComponent] = []
+    components: list[ProductionComponent] = []
 
     for i in result:
         drug_res = await session.get(DrugOrm, ident=i[0])
         components.append(
-            TechnologyComponent(
+            ProductionComponent(
                 component=Drug.model_validate(drug_res),
                 component_amount=i[1],
             )

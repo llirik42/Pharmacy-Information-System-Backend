@@ -21,7 +21,7 @@ async def get_drugs(session: AsyncSession = Depends(get_session)) -> list[Drug]:
 
 @router.get("/popular")
 async def get_popular_drugs(
-        limit: int = 10, drug_type_id: Optional[int] = None, session: AsyncSession = Depends(get_session)
+    limit: int = 10, drug_type_id: Optional[int] = None, session: AsyncSession = Depends(get_session)
 ) -> list[UsedDrug]:
     tmp = "" if drug_type_id is None else f"where type_id = {drug_type_id}"
 
@@ -121,7 +121,7 @@ async def get_critical_amount_drugs(session: AsyncSession = Depends(get_session)
 
 @router.get("/minimal-amount")
 async def get_minimal_amount_drugs(
-        drug_type_id: Optional[int] = None, session: AsyncSession = Depends(get_session)
+    drug_type_id: Optional[int] = None, session: AsyncSession = Depends(get_session)
 ) -> list[StoredDrug]:
     tmp = "" if drug_type_id is None else f"where type_id = {drug_type_id}"
 
@@ -172,7 +172,7 @@ async def get_minimal_amount_drugs(
 
 @router.get("/used")
 async def get_used_drugs(
-        period_start: date, period_end: date, session: AsyncSession = Depends(get_session)
+    period_start: date, period_end: date, session: AsyncSession = Depends(get_session)
 ) -> list[UsedDrug]:
     s1 = f"'{str(period_start).replace('-', '/')}'"
     s2 = f"'{str(period_end).replace('-', '/')}'"
