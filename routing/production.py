@@ -11,8 +11,27 @@ router = APIRouter(prefix="/production")
 
 @router.get("/components")
 async def get_production_components(session: AsyncSession = Depends(get_session)) -> list[ProductionComponent]:
-    query = text(
-        """
+    query = text(_get_production_components_query_string())
+    query_result = await session.execute(query)
+
+    production_components: list[ProductionComponent] = []
+
+    for row in query_result:
+        drug_id: int = row[0]
+        drug_orm = await session.get(DrugOrm, ident=drug_id)
+
+        production_components.append(
+            ProductionComponent(
+                component=Drug.model_validate(drug_orm),
+                component_amount=row[1],
+            )
+        )
+
+    return production_components
+
+
+def _get_production_components_query_string() -> str:
+    return """
         select
             technology_components.component_id,
             sum(production.drug_amount * technology_components.component_amount) as component_amount
@@ -20,20 +39,4 @@ async def get_production_components(session: AsyncSession = Depends(get_session)
             join technologies on production.technology_id = technologies.id
             join technology_components on technologies.id = technology_components.technology_id
         group by technology_components.component_id
-        """
-    )
-
-    result = await session.execute(query)
-
-    components: list[ProductionComponent] = []
-
-    for i in result:
-        drug_res = await session.get(DrugOrm, ident=i[0])
-        components.append(
-            ProductionComponent(
-                component=Drug.model_validate(drug_res),
-                component_amount=i[1],
-            )
-        )
-
-    return components
+    """

@@ -8,6 +8,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from db import get_session
 from models import DrugOrm
 from schemas import StoredDrug, UsedDrug, Drug
+from .utils import date_to_mysql_string
 
 router = APIRouter(prefix="/drugs")
 
@@ -15,17 +16,80 @@ router = APIRouter(prefix="/drugs")
 @router.get("/")
 async def get_drugs(session: AsyncSession = Depends(get_session)) -> list[Drug]:
     query = select(DrugOrm)
-    result = await session.execute(query)
-    return [Drug.model_validate(i) for i in result.scalars().all()]
+    query_result = await session.execute(query)
+    return [Drug.model_validate(drug_orm) for drug_orm in query_result.scalars().all()]
 
 
 @router.get("/popular")
 async def get_popular_drugs(
     limit: int = 10, drug_type_id: Optional[int] = None, session: AsyncSession = Depends(get_session)
 ) -> list[UsedDrug]:
-    tmp = "" if drug_type_id is None else f"where type_id = {drug_type_id}"
+    query = text(_get_popular_drugs_query_string(drug_type_id=drug_type_id, limit=limit))
+    query_result = await session.execute(query)
 
-    query_string = f"""
+    popular_drugs: list[UsedDrug] = []
+
+    for row in query_result:
+        drug_id: int = row[0]
+        drug_orm = await session.get(DrugOrm, ident=drug_id)
+        popular_drugs.append(UsedDrug(drug=Drug.model_validate(drug_orm), uses_number=row[1]))
+
+    return popular_drugs
+
+
+@router.get("/critical-amount")
+async def get_critical_amount_drugs(session: AsyncSession = Depends(get_session)) -> list[Drug]:
+    query = text(_get_critical_amount_drugs_query_string())
+    query_result = await session.execute(query)
+
+    critical_amount_drugs: list[Drug] = []
+
+    for row in query_result:
+        drug_id: int = row[0]
+        drug_orm = await session.get(DrugOrm, ident=drug_id)
+        critical_amount_drugs.append(Drug.model_validate(drug_orm))
+
+    return critical_amount_drugs
+
+
+@router.get("/minimal-amount")
+async def get_minimal_amount_drugs(
+    drug_type_id: Optional[int] = None, session: AsyncSession = Depends(get_session)
+) -> list[StoredDrug]:
+    query = text(_get_minimal_amount_drugs_query_string(drug_type_id))
+    query_result = await session.execute(query)
+
+    minimal_amount_drugs: list[StoredDrug] = []
+
+    for row in query_result:
+        drug_id: int = row[0]
+        drug_orm = await session.get(DrugOrm, ident=drug_id)
+        minimal_amount_drugs.append(StoredDrug(drug=Drug.model_validate(drug_orm), stored_count=row[1]))
+
+    return minimal_amount_drugs
+
+
+@router.get("/used")
+async def get_used_drugs(
+    period_start: date, period_end: date, session: AsyncSession = Depends(get_session)
+) -> list[UsedDrug]:
+    query = text(_get_used_drugs_query_string(period_start=period_start, period_end=period_end))
+    query_result = await session.execute(query)
+
+    used_drugs: list[UsedDrug] = []
+
+    for row in query_result:
+        drug_id: int = row[0]
+        drug_orm = await session.get(DrugOrm, ident=drug_id)
+        used_drugs.append(UsedDrug(drug=Drug.model_validate(drug_orm), uses_number=row[1]))
+
+    return used_drugs
+
+
+def _get_popular_drugs_query_string(drug_type_id: Optional[int], limit: int) -> str:
+    condition: str = "" if drug_type_id is None else f"where type_id = {drug_type_id}"
+
+    return f"""
         with
             used_in_cooking_drugs as (
                 select
@@ -61,7 +125,7 @@ async def get_popular_drugs(
                     from sold_drugs
                     ) as _
                     join drugs on drug_id = drugs.id
-                {tmp}
+                {condition}
                 group by drug_id)
                 
         select drug_id, drug_amount
@@ -70,22 +134,9 @@ async def get_popular_drugs(
         limit {limit}
     """
 
-    result = await session.execute(text(query_string))
 
-    popular_drugs: list[UsedDrug] = []
-
-    for i in result:
-        d = await session.get(DrugOrm, ident=i[0])
-
-        popular_drugs.append(UsedDrug(drug=Drug.model_validate(d), uses_number=i[1]))
-
-    return popular_drugs
-
-
-@router.get("/critical-amount")
-async def get_critical_amount_drugs(session: AsyncSession = Depends(get_session)) -> list[Drug]:
-    query = text(
-        """
+def _get_critical_amount_drugs_query_string() -> str:
+    return """
         with
             critical_amount_drugs as (
                 select
@@ -105,27 +156,13 @@ async def get_critical_amount_drugs(session: AsyncSession = Depends(get_session)
         select drug_id, drug_amount
         from critical_amount_drugs
         order by drug_amount
-        """
-    )
-
-    result = await session.execute(query)
-
-    drugs: list[Drug] = []
-
-    for i in result:
-        drug_res = await session.get(DrugOrm, ident=i[0])
-        drugs.append(Drug.model_validate(drug_res))
-
-    return drugs
+    """
 
 
-@router.get("/minimal-amount")
-async def get_minimal_amount_drugs(
-    drug_type_id: Optional[int] = None, session: AsyncSession = Depends(get_session)
-) -> list[StoredDrug]:
-    tmp = "" if drug_type_id is None else f"where type_id = {drug_type_id}"
+def _get_minimal_amount_drugs_query_string(drug_type_id: Optional[int]) -> str:
+    condition: str = "" if drug_type_id is None else f"where type_id = {drug_type_id}"
 
-    query_s = f"""
+    return f"""
         with
             drugs_storage_amount as (
                 select
@@ -134,7 +171,7 @@ async def get_minimal_amount_drugs(
                     critical_amount
                 from drugs
                     left join storage_items on drugs.id = storage_items.drug_id
-                {tmp}
+                {condition}
                 group by
                     drugs.id,
                     critical_amount
@@ -156,29 +193,12 @@ async def get_minimal_amount_drugs(
         where dr = 1
     """
 
-    query = text(query_s)
 
-    result = await session.execute(query)
+def _get_used_drugs_query_string(period_start: date, period_end: date) -> str:
+    period_start_string: str = date_to_mysql_string(period_start)
+    period_end_string: str = date_to_mysql_string(period_end)
 
-    drugs: list[StoredDrug] = []
-
-    for i in result:
-        res = await session.get(DrugOrm, ident=i[0])
-        drug = Drug.model_validate(res)
-        drugs.append(StoredDrug(drug=drug, stored_count=i[1]))
-
-    return drugs
-
-
-@router.get("/used")
-async def get_used_drugs(
-    period_start: date, period_end: date, session: AsyncSession = Depends(get_session)
-) -> list[UsedDrug]:
-    s1 = f"'{str(period_start).replace('-', '/')}'"
-    s2 = f"'{str(period_end).replace('-', '/')}'"
-
-    query = text(
-        f"""
+    return f"""
             with
                 used_in_cooking_drugs as (
                     select
@@ -187,7 +207,7 @@ async def get_used_drugs(
                     from production
                         join technology_components on production.technology_id = technology_components.technology_id
                         join drugs on technology_components.component_id = drugs.id
-                    where start between {s1} and {s2}
+                    where start between {period_start_string} and {period_end_string}
                     group by component_id
                 ),
         
@@ -197,7 +217,7 @@ async def get_used_drugs(
                         sum(amount) as drug_amount
                     from orders
                         join prescriptions_content using (prescription_id)
-                    where obtaining_datetime between {s1} and {s2}
+                    where obtaining_datetime between {period_start_string} and {period_end_string}
                     group by drug_id
                 ),
         
@@ -219,15 +239,4 @@ async def get_used_drugs(
             select drug_id, drug_amount
             from used_drugs
             order by drug_amount desc
-        """
-    )
-
-    result = await session.execute(query)
-
-    used_drugs: list[UsedDrug] = []
-
-    for i in result:
-        d = await session.get(DrugOrm, ident=i[0])
-        used_drugs.append(UsedDrug(drug=Drug.model_validate(d), uses_number=i[1]))
-
-    return used_drugs
+    """

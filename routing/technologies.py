@@ -21,14 +21,14 @@ async def get_technologies(
     query = text(
         _get_technologies_query_string(drug_id=drug_id, drug_type_id=drug_type_id, in_production=in_production)
     )
-
-    result = await session.execute(query)
+    query_result = await session.execute(query)
 
     technologies: list[Technology] = []
 
-    for i in result:
-        q = await session.get(TechnologyOrm, ident=i[0])
-        technologies.append(Technology.model_validate(q))
+    for row in query_result:
+        technology_id: int = row[0]
+        technology_orm = await session.get(TechnologyOrm, ident=technology_id)
+        technologies.append(Technology.model_validate(technology_orm))
 
     return technologies
 

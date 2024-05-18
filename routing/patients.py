@@ -12,5 +12,5 @@ router = APIRouter(prefix="/patients")
 @router.get("/")
 async def get_patients(session: AsyncSession = Depends(get_session)) -> list[Patient]:
     query = select(PatientOrm)
-    result = await session.execute(query)
-    return [Patient.model_validate(i) for i in result.scalars().all()]
+    query_result = await session.execute(query)
+    return [Patient.model_validate(p) for p in query_result.scalars().all()]

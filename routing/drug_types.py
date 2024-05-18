@@ -12,14 +12,27 @@ router = APIRouter(prefix="/drug-types")
 @router.get("/")
 async def get_drug_types(session: AsyncSession = Depends(get_session)) -> list[DrugType]:
     query = select(DrugTypeOrm)
-    result = await session.execute(query)
-    return [DrugType.model_validate(i) for i in result.scalars().all()]
+    query_result = await session.execute(query)
+    return [DrugType.model_validate(drug_type_orm) for drug_type_orm in query_result.scalars().all()]
 
 
 @router.get("/critical-amount")
 async def get_critical_amount_drug_types(session: AsyncSession = Depends(get_session)) -> list[DrugType]:
-    query = text(
-        """
+    query = text(_get_critical_amount_drug_types_query_string())
+    query_result = await session.execute(query)
+
+    critical_amount_drug_types: list[DrugType] = []
+
+    for row in query_result:
+        drug_type_id: int = row[0]
+        drug_type_orm = await session.get(DrugTypeOrm, ident=drug_type_id)
+        critical_amount_drug_types.append(DrugType.model_validate(drug_type_orm))
+
+    return critical_amount_drug_types
+
+
+def _get_critical_amount_drug_types_query_string() -> str:
+    return """
         with
             critical_amount_drugs as (
                 select
@@ -42,15 +55,4 @@ async def get_critical_amount_drug_types(session: AsyncSession = Depends(get_ses
             join drugs on critical_amount_drugs.drug_id = drugs.id
         order by
             type_id
-        """
-    )
-
-    result = await session.execute(query)
-
-    drug_types: list[DrugType] = []
-
-    for i in result:
-        drug_type_res = await session.get(DrugTypeOrm, ident=i[0])
-        drug_types.append(DrugType.model_validate(drug_type_res))
-
-    return drug_types
+    """
