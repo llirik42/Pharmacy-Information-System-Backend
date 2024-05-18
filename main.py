@@ -9,7 +9,7 @@ import routing.patients
 import routing.production
 import routing.technologies
 
-app = FastAPI()
+app = FastAPI(separate_input_output_schemas=False)
 app.include_router(routing.orders.router)
 app.include_router(routing.customers.router)
 app.include_router(routing.drugs.router)
