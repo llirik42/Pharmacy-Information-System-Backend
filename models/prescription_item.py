@@ -11,7 +11,7 @@ class PrescriptionItemOrm(Base):
 
     prescription_id: Mapped[int] = mapped_column(ForeignKey("prescriptions.id"), primary_key=True)
     drug_id: Mapped[int] = mapped_column(ForeignKey("drugs.id"), primary_key=True)
-    amount: Mapped[int] = mapped_column(CheckConstraint("amount > 0"))
+    amount: Mapped[int] = mapped_column()
     administration_route_id: Mapped[int] = mapped_column(ForeignKey("administration_routes.id"), primary_key=True)
     drug: Mapped[DrugOrm] = relationship(
         lazy="joined",
@@ -19,3 +19,5 @@ class PrescriptionItemOrm(Base):
     administration_route: Mapped[AdministrationRouteOrm] = relationship(
         lazy="joined",
     )
+
+    __table_args__ = (CheckConstraint("amount > 0"),)

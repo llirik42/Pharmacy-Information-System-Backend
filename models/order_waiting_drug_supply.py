@@ -9,4 +9,6 @@ class OrderWaitingDrugSupplyOrm(Base):
 
     order_id: Mapped[int] = mapped_column(ForeignKey("prescriptions.id"), primary_key=True)
     drug_id: Mapped[int] = mapped_column(ForeignKey("drugs.id"), primary_key=True)
-    amount: Mapped[int] = mapped_column(CheckConstraint("amount > 0"))
+    amount: Mapped[int] = mapped_column()
+
+    __table_args__ = (CheckConstraint("amount > 0"),)

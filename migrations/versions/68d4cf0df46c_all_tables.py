@@ -1,8 +1,8 @@
-"""added_all_tables
+"""all_tables
 
-Revision ID: 98713ebfff23
-Revises: 2ef718d5629b
-Create Date: 2024-05-15 20:36:44.075267
+Revision ID: 68d4cf0df46c
+Revises: 51aecdc020f4
+Create Date: 2024-05-18 21:27:08.334700
 
 """
 from typing import Sequence, Union
@@ -12,8 +12,8 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision: str = '98713ebfff23'
-down_revision: Union[str, None] = '2ef718d5629b'
+revision: str = '68d4cf0df46c'
+down_revision: Union[str, None] = '51aecdc020f4'
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
 
@@ -88,6 +88,9 @@ def upgrade() -> None:
     sa.Column('critical_amount', sa.Integer(), nullable=False),
     sa.Column('type_id', sa.Integer(), nullable=False),
     sa.Column('description', sa.String(length=256), nullable=False),
+    sa.CheckConstraint('cost > 0'),
+    sa.CheckConstraint('critical_amount >= 0'),
+    sa.CheckConstraint('shelf_life > 0'),
     sa.ForeignKeyConstraint(['type_id'], ['drug_types.id'], ),
     sa.PrimaryKeyConstraint('id'),
     sa.UniqueConstraint('name')
@@ -127,6 +130,7 @@ def upgrade() -> None:
     sa.Column('order_id', sa.Integer(), nullable=False),
     sa.Column('drug_id', sa.Integer(), nullable=False),
     sa.Column('amount', sa.Integer(), nullable=False),
+    sa.CheckConstraint('amount > 0'),
     sa.ForeignKeyConstraint(['drug_id'], ['drugs.id'], ),
     sa.ForeignKeyConstraint(['order_id'], ['prescriptions.id'], ),
     sa.PrimaryKeyConstraint('order_id', 'drug_id')
@@ -135,6 +139,8 @@ def upgrade() -> None:
     sa.Column('drug_id', sa.Integer(), nullable=False),
     sa.Column('weight_of_pill', sa.Integer(), nullable=False),
     sa.Column('pills_count', sa.Integer(), nullable=False),
+    sa.CheckConstraint('pills_count > 0'),
+    sa.CheckConstraint('weight_of_pill > 0'),
     sa.ForeignKeyConstraint(['drug_id'], ['drugs.id'], ),
     sa.PrimaryKeyConstraint('drug_id')
     )
@@ -149,6 +155,7 @@ def upgrade() -> None:
     sa.Column('drug_id', sa.Integer(), nullable=False),
     sa.Column('amount', sa.Integer(), nullable=False),
     sa.Column('administration_route_id', sa.Integer(), nullable=False),
+    sa.CheckConstraint('amount > 0'),
     sa.ForeignKeyConstraint(['administration_route_id'], ['administration_routes.id'], ),
     sa.ForeignKeyConstraint(['drug_id'], ['drugs.id'], ),
     sa.ForeignKeyConstraint(['prescription_id'], ['prescriptions.id'], ),
@@ -163,6 +170,7 @@ def upgrade() -> None:
     op.create_table('solutions',
     sa.Column('drug_id', sa.Integer(), nullable=False),
     sa.Column('dosage', sa.Integer(), nullable=False),
+    sa.CheckConstraint('(0 <= dosage) and (dosage <= 100)'),
     sa.ForeignKeyConstraint(['drug_id'], ['drugs.id'], ),
     sa.PrimaryKeyConstraint('drug_id')
     )
@@ -172,6 +180,8 @@ def upgrade() -> None:
     sa.Column('available_amount', sa.Integer(), nullable=False),
     sa.Column('original_amount', sa.Integer(), nullable=False),
     sa.Column('receipt_datetime', sa.DateTime(), nullable=False),
+    sa.CheckConstraint('available_amount >= 0'),
+    sa.CheckConstraint('original_amount > 0'),
     sa.ForeignKeyConstraint(['drug_id'], ['drugs.id'], ),
     sa.PrimaryKeyConstraint('id')
     )
@@ -183,6 +193,8 @@ def upgrade() -> None:
     sa.Column('assigned_datetime', sa.DateTime(), nullable=False),
     sa.Column('delivery_datetime', sa.DateTime(), nullable=True),
     sa.Column('supplier_id', sa.Integer(), nullable=False),
+    sa.CheckConstraint('cost >= 0'),
+    sa.CheckConstraint('drug_amount > 0'),
     sa.ForeignKeyConstraint(['drug_id'], ['drugs.id'], ),
     sa.ForeignKeyConstraint(['supplier_id'], ['suppliers.id'], ),
     sa.PrimaryKeyConstraint('id')
@@ -193,6 +205,7 @@ def upgrade() -> None:
     sa.Column('cooking_time', sa.Time(), nullable=False),
     sa.Column('amount', sa.Integer(), nullable=False),
     sa.Column('description', sa.String(length=256), nullable=False),
+    sa.CheckConstraint('amount > 0'),
     sa.ForeignKeyConstraint(['drug_id'], ['drugs.id'], ),
     sa.PrimaryKeyConstraint('id')
     )
@@ -210,6 +223,7 @@ def upgrade() -> None:
     sa.Column('start', sa.DateTime(), nullable=True),
     sa.Column('end', sa.DateTime(), nullable=True),
     sa.CheckConstraint('((start is null) and (end is null)) or (end is null) or (end >= start)'),
+    sa.CheckConstraint('drug_amount > 0'),
     sa.ForeignKeyConstraint(['order_id'], ['orders.id'], ),
     sa.ForeignKeyConstraint(['technology_id'], ['technologies.id'], ),
     sa.PrimaryKeyConstraint('id')
@@ -218,6 +232,7 @@ def upgrade() -> None:
     sa.Column('order_id', sa.Integer(), nullable=False),
     sa.Column('storage_item_id', sa.Integer(), nullable=False),
     sa.Column('drug_amount', sa.Integer(), nullable=False),
+    sa.CheckConstraint('drug_amount > 0'),
     sa.ForeignKeyConstraint(['order_id'], ['orders.id'], ),
     sa.ForeignKeyConstraint(['storage_item_id'], ['storage_items.id'], ),
     sa.PrimaryKeyConstraint('order_id', 'storage_item_id')
@@ -226,6 +241,7 @@ def upgrade() -> None:
     sa.Column('technology_id', sa.Integer(), nullable=False),
     sa.Column('component_id', sa.Integer(), nullable=False),
     sa.Column('component_amount', sa.Integer(), nullable=False),
+    sa.CheckConstraint('component_amount > 0'),
     sa.ForeignKeyConstraint(['component_id'], ['drugs.id'], ),
     sa.ForeignKeyConstraint(['technology_id'], ['technologies.id'], ),
     sa.PrimaryKeyConstraint('technology_id', 'component_id')

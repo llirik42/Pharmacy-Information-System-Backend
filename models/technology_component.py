@@ -10,5 +10,7 @@ class TechnologyComponentOrm(Base):
 
     technology_id: Mapped[int] = mapped_column(ForeignKey("technologies.id"), primary_key=True)
     component_id: Mapped[int] = mapped_column(ForeignKey("drugs.id"), primary_key=True)
-    component_amount: Mapped[int] = mapped_column(CheckConstraint("component_amount > 0"))
+    component_amount: Mapped[int] = mapped_column()
     component: Mapped[DrugOrm] = relationship(lazy="joined")
+
+    __table_args__ = (CheckConstraint("component_amount > 0"),)

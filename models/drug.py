@@ -10,9 +10,15 @@ class DrugOrm(Base):
 
     id: Mapped[int] = mapped_column(primary_key=True)
     name: Mapped[str] = mapped_column(String(256), unique=True)
-    cost: Mapped[int] = mapped_column(CheckConstraint("cost > 0"))
-    shelf_life: Mapped[int] = mapped_column(CheckConstraint("shelf_life > 0"))
-    critical_amount: Mapped[int] = mapped_column(CheckConstraint("critical_amount >= 0"))
+    cost: Mapped[int] = mapped_column()
+    shelf_life: Mapped[int] = mapped_column()
+    critical_amount: Mapped[int] = mapped_column()
     type_id: Mapped[int] = mapped_column(ForeignKey("drug_types.id"))
     description: Mapped[str] = mapped_column(String(256))
     drug_type: Mapped[DrugTypeOrm] = relationship(lazy="joined")
+
+    __table_args__ = (
+        CheckConstraint("cost > 0"),
+        CheckConstraint("shelf_life > 0"),
+        CheckConstraint("critical_amount >= 0"),
+    )
