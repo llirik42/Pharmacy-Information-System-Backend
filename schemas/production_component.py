@@ -1,8 +1,9 @@
-from pydantic import BaseModel, Field
+from pydantic import Field
 
+from .base.base import Base
 from .base.drug import Drug
 
 
-class ProductionComponent(BaseModel):
+class ProductionComponent(Base):
     component: Drug
     component_amount: int = Field(ge=1)

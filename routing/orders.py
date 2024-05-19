@@ -29,10 +29,11 @@ from schemas import (
     PrescriptionItem,
 )
 from schemas.responses import (
-    BaseResponse,
-    CreateOrderResponse,
-    create_error_base_response,
-    create_error_order_response
+    OrderStatus,
+    OrderResponse,
+    create_order_not_found_response,
+    create_order_internal_error_response,
+    create_order_success_response,
 )
 
 router = APIRouter(prefix="/orders")
@@ -40,10 +41,7 @@ logger = logging.getLogger("orders")
 
 
 @router.post("/")
-async def create_order(
-        prescription: Prescription,
-        session: AsyncSession = Depends(get_session)
-) -> CreateOrderResponse:
+async def create_order(prescription: Prescription, session: AsyncSession = Depends(get_session)) -> OrderResponse:
     items: list[PrescriptionItem] = prescription.items
     drug_orms: list[DrugOrm] = []
     administration_route_orms: list[AdministrationRouteOrm] = []
@@ -55,7 +53,10 @@ async def create_order(
         if not drug_orm:
             message: str = f"Unknown drug {drug.name}"
             logger.error(message)
-            return create_error_order_response(message)
+            return OrderResponse(
+                message=message,
+                status_code=OrderStatus.UNKNOWN_ORDER_DRUG,
+            )
 
         administration_route = it.administration_route
         administration_route_orm: AdministrationRouteOrm = await _find_administration_route(
@@ -64,7 +65,10 @@ async def create_order(
         if not administration_route_orm:
             message: str = f"Unknown administration route {administration_route.name}"
             logger.error(message)
-            return create_error_order_response(message)
+            return OrderResponse(
+                message=message,
+                status_code=OrderStatus.UNKNOWN_ORDER_ADMINISTRATION_ROUTE,
+            )
 
         drug_orms.append(drug_orm)
         administration_route_orms.append(administration_route_orm)
@@ -99,11 +103,15 @@ async def create_order(
         registration_datetime=datetime.now(),
     )
     await _create_object(session=session, obj=order_orm)
-
     await session.commit()
 
-    # TODO: add business-logic: reserving drugs, starting production etc.
-    return CreateOrderResponse(is_customer_required=True, order_id=order_orm.id)
+    # TODO: Add business-logic (reserve drugs, start production)
+    if len(items) > 1:
+        return OrderResponse(
+            message="Order waiting drugs", status=OrderStatus.ORDER_WAITING_PRODUCTION_OR_SUPPLY, order_id=order_orm.id
+        )
+
+    return OrderResponse(message="Order created", status=OrderStatus.ORDER_CREATED, order_id=order_orm.id)
 
 
 @router.get("/")
@@ -146,91 +154,88 @@ async def get_orders_in_production(session: AsyncSession = Depends(get_session))
 @router.post("/{order_id}/customers")
 async def set_order_customer(
     order_id: int, customer: Customer, session: AsyncSession = Depends(get_session)
-) -> BaseResponse:
+) -> OrderResponse:
     order: Optional[OrderOrm] = await _find_order_by_id(order_id=order_id, session=session)
 
     if order is None:
-        message: str = f"Order {order_id} not found"
-        logger.error(message)
-        return create_error_base_response(message)
+        _log_order_not_found(order_id)
+        return create_order_not_found_response(order_id)
 
     customer_orm: CustomerOrm = await _find_or_create_customer(customer=customer, session=session)
 
     try:
         order.customer_id = customer_orm.id
         await session.commit()
-        return BaseResponse()
+        return create_order_success_response(order_id)
     except Exception as e:
-        message: str = f"Failed to assign customer {customer_orm.id} for order {order_id}"
-        logger.error(message, exc_info=e)
-        return create_error_base_response(message)
+        logger.error(f"Failed to assign customer {customer_orm.id} to order {order_id}", exc_info=e)
+        return create_order_internal_error_response(
+            order_id=order_id,
+            message=f"Failed to assign customer {customer_orm.id}",
+        )
 
 
 @router.delete("/{order_id}/customers")
-async def delete_order_customer(order_id: int, session: AsyncSession = Depends(get_session)) -> BaseResponse:
+async def delete_order_customer(order_id: int, session: AsyncSession = Depends(get_session)) -> OrderResponse:
     order: Optional[OrderOrm] = await _find_order_by_id(order_id=order_id, session=session)
 
     if order is None:
-        message: str = f"Order {order_id} not found"
-        logger.error(message)
-        return create_error_base_response(message)
+        _log_order_not_found(order_id)
+        return create_order_not_found_response(order_id)
 
     try:
         order.customer_id = None
         await session.commit()
-        return BaseResponse()
+        return create_order_success_response(order_id)
     except Exception as e:
-        message: str = f"Failed to remove customer from order {order_id}"
-        logger.error(message, exc_info=e)
-        return create_error_base_response(message)
+        logger.error("Failed to delete customer from order %s", order_id, exc_info=e)
+        return create_order_internal_error_response(order_id=order_id, message="Failed to delete customer")
 
 
 @router.post("/{order_id}/pay")
-async def pay_for_order(order_id: int, session: AsyncSession = Depends(get_session)) -> BaseResponse:
+async def pay_for_order(order_id: int, session: AsyncSession = Depends(get_session)) -> OrderResponse:
     order: Optional[OrderOrm] = await _find_order_by_id(order_id=order_id, session=session)
 
     if order is None:
-        message: str = f"Order {order_id} not found"
-        logger.error(message)
-        return create_error_base_response(message)
+        _log_order_not_found(order_id)
+        return create_order_not_found_response(order_id)
 
     if order.paid:
-        message: str = f"Order {order_id} has already been paid for"
-        logger.error(message)
-        return create_error_base_response(message)
+        logger.error(f"Order {order_id} is already paid for")
+        return OrderResponse(
+            message=f"Order is already paid for", status=OrderStatus.ORDER_ID_ALREADY_PAID_FOR, order_id=order_id
+        )
 
     try:
         order.paid = True
         await session.commit()
-        return BaseResponse()
+        return create_order_success_response(order_id)
     except Exception as e:
-        message: str = f"Failed to pay for order {order_id}"
-        logger.error(message, exc_info=e)
-        return create_error_base_response(message)
+        logger.error("Failed to pay for order %s", order_id, exc_info=e)
+        return create_order_internal_error_response(order_id=order_id, message="Failed to pay for order")
 
 
 @router.post("/{order_id}/obtain")
-async def obtain_order(order_id: int, session: AsyncSession = Depends(get_session)) -> BaseResponse:
+async def obtain_order(order_id: int, session: AsyncSession = Depends(get_session)) -> OrderResponse:
     order: Optional[OrderOrm] = await _find_order_by_id(order_id=order_id, session=session)
 
     if order is None:
-        message: str = f"Order {order_id} not found"
-        logger.error(message)
-        return create_error_base_response(message)
+        _log_order_not_found(order_id)
+        return create_order_not_found_response(order_id)
 
     if order.obtaining_datetime is not None:
-        message: str = f"Order {order_id} has already been obtained"
-        logger.error(message)
-        return create_error_base_response(message)
+        logger.error(f"Order {order_id} is already obtained")
+        return OrderResponse(
+            message=f"Order is already obtained found", status=OrderStatus.ORDER_IS_ALREADY_OBTAINED, order_id=order_id
+        )
 
     try:
         order.obtaining_datetime = datetime.now()
         await session.commit()
-        return BaseResponse()
+        return create_order_success_response(order_id)
     except Exception as e:
-        message: str = f"Failed to obtain order {order_id}"
-        logger.error(message, exc_info=e)
-        return create_error_base_response(message)
+        logger.error("Failed to obtain order %s", order_id, exc_info=e)
+        return create_order_internal_error_response(order_id=order_id, message="Failed to obtain order")
 
 
 async def _find_order_by_id(order_id: int, session: AsyncSession) -> Optional[OrderOrm]:
@@ -238,10 +243,7 @@ async def _find_order_by_id(order_id: int, session: AsyncSession) -> Optional[Or
 
 
 async def _find_or_create_patient(patient: Patient, session: AsyncSession) -> PatientOrm:
-    query = select(PatientOrm).where(
-        PatientOrm.full_name == patient.full_name,
-        PatientOrm.birthday == patient.birthday
-    )
+    query = select(PatientOrm).where(PatientOrm.full_name == patient.full_name, PatientOrm.birthday == patient.birthday)
     query_result = await session.execute(query)
     candidates = query_result.scalars().all()
 
@@ -308,9 +310,7 @@ async def _find_drug(drug: Drug, session: AsyncSession) -> Optional[DrugOrm]:
 async def _find_administration_route(
     administration_route: AdministrationRoute, session: AsyncSession
 ) -> Optional[AdministrationRouteOrm]:
-    query = select(AdministrationRouteOrm).where(
-        AdministrationRouteOrm.description == administration_route.description
-    )
+    query = select(AdministrationRouteOrm).where(AdministrationRouteOrm.description == administration_route.description)
     query_result = await session.execute(query)
     candidates = query_result.scalars().all()
 
@@ -342,3 +342,7 @@ def _get_orders_in_production_query_string() -> str:
     return """
         select distinct order_id from production
     """
+
+
+def _log_order_not_found(order_id: int) -> None:
+    logger.error(f"Order {order_id} not found")
