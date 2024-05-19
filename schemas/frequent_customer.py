@@ -6,4 +6,4 @@ from .base.customer import Customer
 
 class FrequentCustomer(Base):
     customer: Customer
-    orders_count: int = Field(ge=0)
+    order_count: int = Field(ge=0)
