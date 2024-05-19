@@ -81,7 +81,7 @@ async def get_used_drugs(
     for row in query_result:
         drug_id: int = row[0]
         drug_orm = await session.get(DrugOrm, ident=drug_id)
-        used_drugs.append(UsedDrug(drug=Drug.model_validate(drug_orm), uses_number=row[1]))
+        used_drugs.append(UsedDrug(drug=Drug.model_validate(drug_orm), use_number=row[1]))
 
     return used_drugs
 
