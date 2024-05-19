@@ -78,7 +78,7 @@ async def get_frequent_customers(
         frequent_customers.append(
             FrequentCustomer(
                 customer=Customer.model_validate(customer_orm),
-                orders_count=row[1],
+                order_count=row[1],
             )
         )
 
