@@ -6,4 +6,4 @@ from .base.drug import Drug
 
 class UsedDrug(Base):
     drug: Drug
-    uses_number: int = Field(ge=0)
+    use_number: int = Field(ge=0)
