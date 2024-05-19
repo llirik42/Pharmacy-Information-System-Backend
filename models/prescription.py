@@ -1,6 +1,6 @@
 from datetime import date
 
-from sqlalchemy import String, ForeignKey, UniqueConstraint, Date
+from sqlalchemy import String, ForeignKey, Date
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from .base import Base
@@ -26,5 +26,3 @@ class PrescriptionOrm(Base):
     doctor: Mapped[DoctorOrm] = relationship(
         lazy="joined",
     )
-
-    __table_args__ = (UniqueConstraint("diagnosis", "patient_id", "doctor_id", "date"),)

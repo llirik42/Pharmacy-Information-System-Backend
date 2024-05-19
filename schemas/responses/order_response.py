@@ -17,8 +17,8 @@ def create_order_success_response(order_id: int) -> OrderResponse:
 
 
 def create_order_not_found_response(order_id: int) -> OrderResponse:
-    return OrderResponse(message=f"Order not found", status=OrderStatus.ORDER_NOT_FOUND, order_id=order_id)
+    return OrderResponse(message=f"Order not found", status=OrderStatus.NOT_FOUND, order_id=order_id)
 
 
-def create_order_internal_error_response(order_id: int, message: str) -> OrderResponse:
-    return OrderResponse(message=message, status=OrderStatus.INTERNAL_ERROR, order_id=order_id)
+def create_order_internal_error_response(order_id: int) -> OrderResponse:
+    return OrderResponse(status=OrderStatus.INTERNAL_ERROR, order_id=order_id)

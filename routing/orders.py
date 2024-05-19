@@ -55,19 +55,20 @@ async def create_order(prescription: Prescription, session: AsyncSession = Depen
             logger.error(message)
             return OrderResponse(
                 message=message,
-                status_code=OrderStatus.UNKNOWN_ORDER_DRUG,
+                status_code=OrderStatus.UNKNOWN_DRUG,
             )
 
         administration_route = it.administration_route
         administration_route_orm: AdministrationRouteOrm = await _find_administration_route(
-            administration_route=administration_route, session=session
+            administration_route=administration_route,
+            session=session
         )
         if not administration_route_orm:
             message: str = f"Unknown administration route {administration_route.name}"
             logger.error(message)
             return OrderResponse(
                 message=message,
-                status_code=OrderStatus.UNKNOWN_ORDER_ADMINISTRATION_ROUTE,
+                status_code=OrderStatus.UNKNOWN_ADMINISTRATION_ROUTE,
             )
 
         drug_orms.append(drug_orm)
@@ -108,10 +109,10 @@ async def create_order(prescription: Prescription, session: AsyncSession = Depen
     # TODO: Add business-logic (reserve drugs, start production)
     if len(items) > 1:
         return OrderResponse(
-            message="Order waiting drugs", status=OrderStatus.ORDER_WAITING_PRODUCTION_OR_SUPPLY, order_id=order_orm.id
+            message="Order waiting drugs", status=OrderStatus.WAITING_PRODUCTION_OR_SUPPLY, order_id=order_orm.id
         )
 
-    return OrderResponse(message="Order created", status=OrderStatus.ORDER_CREATED, order_id=order_orm.id)
+    return OrderResponse(message="Order created", status=OrderStatus.CREATED, order_id=order_orm.id)
 
 
 @router.get("/")
@@ -155,13 +156,33 @@ async def get_orders_in_production(session: AsyncSession = Depends(get_session))
 async def set_order_customer(
     order_id: int, customer: Customer, session: AsyncSession = Depends(get_session)
 ) -> OrderResponse:
-    order: Optional[OrderOrm] = await _find_order_by_id(order_id=order_id, session=session)
+    try:
+        order: Optional[OrderOrm] = await _find_order_by_id(order_id=order_id, session=session)
+    except Exception as e:
+        logger.error("Searching for order %s failed", order_id, exc_info=e)
+        return create_order_internal_error_response(
+            order_id=order_id,
+        )
 
     if order is None:
         _log_order_not_found(order_id)
         return create_order_not_found_response(order_id)
 
-    customer_orm: CustomerOrm = await _find_or_create_customer(customer=customer, session=session)
+    try:
+        customer_orm: CustomerOrm = await _find_or_create_customer(customer=customer, session=session)
+    except Exception as e:
+        logger.error(
+            f"Invalid customer (%s, %s, %s)",
+            customer.full_name,
+            customer.phone_number,
+            customer.address,
+            exc_info=e
+        )
+        return OrderResponse(
+            message="Invalid customer",
+            status=OrderStatus.INVALID_CUSTOMER,
+            order_id=order_id,
+        )
 
     try:
         order.customer_id = customer_orm.id
@@ -171,17 +192,30 @@ async def set_order_customer(
         logger.error(f"Failed to assign customer {customer_orm.id} to order {order_id}", exc_info=e)
         return create_order_internal_error_response(
             order_id=order_id,
-            message=f"Failed to assign customer {customer_orm.id}",
         )
 
 
 @router.delete("/{order_id}/customers")
 async def delete_order_customer(order_id: int, session: AsyncSession = Depends(get_session)) -> OrderResponse:
-    order: Optional[OrderOrm] = await _find_order_by_id(order_id=order_id, session=session)
+    try:
+        order: Optional[OrderOrm] = await _find_order_by_id(order_id=order_id, session=session)
+    except Exception as e:
+        logger.error("Searching for order %s failed", order_id, exc_info=e)
+        return create_order_internal_error_response(
+            order_id=order_id,
+        )
 
     if order is None:
         _log_order_not_found(order_id)
         return create_order_not_found_response(order_id)
+
+    if order.customer_id is None:
+        logger.error(f"Customer not assigned to order {order_id}")
+        return OrderResponse(
+            message="Customer not assigned",
+            status=OrderStatus.CUSTOMER_NOT_ASSIGNED,
+            order_id=order_id
+        )
 
     try:
         order.customer_id = None
@@ -189,12 +223,22 @@ async def delete_order_customer(order_id: int, session: AsyncSession = Depends(g
         return create_order_success_response(order_id)
     except Exception as e:
         logger.error("Failed to delete customer from order %s", order_id, exc_info=e)
-        return create_order_internal_error_response(order_id=order_id, message="Failed to delete customer")
+        return OrderResponse(
+            message="Failed to delete customer",
+            order_id=order_id,
+            status=OrderStatus.CANNOT_DELETE_CUSTOMER
+        )
 
 
 @router.post("/{order_id}/pay")
 async def pay_for_order(order_id: int, session: AsyncSession = Depends(get_session)) -> OrderResponse:
-    order: Optional[OrderOrm] = await _find_order_by_id(order_id=order_id, session=session)
+    try:
+        order: Optional[OrderOrm] = await _find_order_by_id(order_id=order_id, session=session)
+    except Exception as e:
+        logger.error("Searching for order %s failed", order_id, exc_info=e)
+        return create_order_internal_error_response(
+            order_id=order_id,
+        )
 
     if order is None:
         _log_order_not_found(order_id)
@@ -203,7 +247,9 @@ async def pay_for_order(order_id: int, session: AsyncSession = Depends(get_sessi
     if order.paid:
         logger.error(f"Order {order_id} is already paid for")
         return OrderResponse(
-            message=f"Order is already paid for", status=OrderStatus.ORDER_ID_ALREADY_PAID_FOR, order_id=order_id
+            message=f"Order is already paid for",
+            status=OrderStatus.ALREADY_PAID,
+            order_id=order_id
         )
 
     try:
@@ -212,12 +258,22 @@ async def pay_for_order(order_id: int, session: AsyncSession = Depends(get_sessi
         return create_order_success_response(order_id)
     except Exception as e:
         logger.error("Failed to pay for order %s", order_id, exc_info=e)
-        return create_order_internal_error_response(order_id=order_id, message="Failed to pay for order")
+        return OrderResponse(
+            order_id=order_id,
+            message="Order cannot be paid for",
+            status=OrderStatus.CANNOT_BE_OBTAINED
+        )
 
 
 @router.post("/{order_id}/obtain")
 async def obtain_order(order_id: int, session: AsyncSession = Depends(get_session)) -> OrderResponse:
-    order: Optional[OrderOrm] = await _find_order_by_id(order_id=order_id, session=session)
+    try:
+        order: Optional[OrderOrm] = await _find_order_by_id(order_id=order_id, session=session)
+    except Exception as e:
+        logger.error("Searching for order %s failed", order_id, exc_info=e)
+        return create_order_internal_error_response(
+            order_id=order_id,
+        )
 
     if order is None:
         _log_order_not_found(order_id)
@@ -226,7 +282,9 @@ async def obtain_order(order_id: int, session: AsyncSession = Depends(get_sessio
     if order.obtaining_datetime is not None:
         logger.error(f"Order {order_id} is already obtained")
         return OrderResponse(
-            message=f"Order is already obtained found", status=OrderStatus.ORDER_IS_ALREADY_OBTAINED, order_id=order_id
+            message=f"Order is already obtained found",
+            status=OrderStatus.ALREADY_OBTAINED,
+            order_id=order_id
         )
 
     try:
@@ -235,7 +293,11 @@ async def obtain_order(order_id: int, session: AsyncSession = Depends(get_sessio
         return create_order_success_response(order_id)
     except Exception as e:
         logger.error("Failed to obtain order %s", order_id, exc_info=e)
-        return create_order_internal_error_response(order_id=order_id, message="Failed to obtain order")
+        return OrderResponse(
+            order_id=order_id,
+            message="Cannot obtain order",
+            status=OrderStatus.CANNOT_BE_PAID
+        )
 
 
 async def _find_order_by_id(order_id: int, session: AsyncSession) -> Optional[OrderOrm]:
