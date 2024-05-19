@@ -1,7 +1,7 @@
 from pydantic import Field
 
-from .order_status import OrderStatus
-from ..base.base import Base
+from schemas.responses.order.order_status import OrderStatus
+from schemas.base.base import Base
 
 
 class OrderResponse(Base):

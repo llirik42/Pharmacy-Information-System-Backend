@@ -1,4 +1,5 @@
 __all__ = [
+    "Base",
     "AdministrationRoute",
     "DrugType",
     "Customer",
@@ -21,6 +22,7 @@ __all__ = [
     "ProductionComponent",
 ]
 
+from .base.base import Base
 from .base.administration_route import AdministrationRoute
 from .base.customer import Customer
 from .base.doctor import Doctor

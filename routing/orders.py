@@ -12,21 +12,17 @@ from models import (
     CustomerOrm,
     DoctorOrm,
     PatientOrm,
-    PrescriptionOrm,
-    PrescriptionItemOrm,
     Base,
     DrugOrm,
     AdministrationRouteOrm,
 )
 from schemas import (
     Order,
-    Prescription,
     Customer,
     Doctor,
     Patient,
     Drug,
     AdministrationRoute,
-    PrescriptionItem,
 )
 from schemas.responses import (
     OrderStatus,
@@ -41,76 +37,76 @@ logger = logging.getLogger("orders")
 
 
 @router.post("/")
-async def create_order(prescription: Prescription, session: AsyncSession = Depends(get_session)) -> OrderResponse:
-    items: list[PrescriptionItem] = prescription.items
-    drug_orms: list[DrugOrm] = []
-    administration_route_orms: list[AdministrationRouteOrm] = []
-
-    # Get and validate drugs and administration routes of prescription
-    for it in items:
-        drug: Drug = it.drug
-        drug_orm: DrugOrm = await _find_drug(drug=drug, session=session)
-        if not drug_orm:
-            message: str = f"Unknown drug {drug.name}"
-            logger.error(message)
-            return OrderResponse(
-                message=message,
-                status_code=OrderStatus.UNKNOWN_DRUG,
-            )
-
-        administration_route = it.administration_route
-        administration_route_orm: AdministrationRouteOrm = await _find_administration_route(
-            administration_route=administration_route,
-            session=session
-        )
-        if not administration_route_orm:
-            message: str = f"Unknown administration route {administration_route.name}"
-            logger.error(message)
-            return OrderResponse(
-                message=message,
-                status_code=OrderStatus.UNKNOWN_ADMINISTRATION_ROUTE,
-            )
-
-        drug_orms.append(drug_orm)
-        administration_route_orms.append(administration_route_orm)
-
-    # Create prescription
-    doctor_orm: DoctorOrm = await _find_or_create_doctor(doctor=prescription.doctor, session=session)
-    patient_orm: PatientOrm = await _find_or_create_patient(patient=prescription.patient, session=session)
-    prescription_orm = PrescriptionOrm(
-        diagnosis=prescription.diagnosis,
-        patient_id=patient_orm.id,
-        doctor_id=doctor_orm.id,
-        date=prescription.date,
-    )
-    await _create_object(session=session, obj=prescription_orm)
-
-    # Add items to prescription
-    for i, it in enumerate(items):
-        drug_orm = drug_orms[i]
-        administration_route_orm = administration_route_orms[i]
-
-        prescription_item_orm = PrescriptionItemOrm(
-            prescription_id=prescription_orm.id,
-            drug_id=drug_orm.id,
-            amount=it.amount,
-            administration_route_id=administration_route_orm.id,
-        )
-        await _create_object(session=session, obj=prescription_item_orm)
-
-    # Create order
-    order_orm = OrderOrm(
-        prescription_id=prescription_orm.id,
-        registration_datetime=datetime.now(),
-    )
-    await _create_object(session=session, obj=order_orm)
-    await session.commit()
-
-    # TODO: Add business-logic (reserve drugs, start production)
-    if len(items) > 1:
-        return OrderResponse(
-            message="Order waiting drugs", status=OrderStatus.WAITING_PRODUCTION_OR_SUPPLY, order_id=order_orm.id
-        )
+async def create_order(prescription_id: int, session: AsyncSession = Depends(get_session)) -> OrderResponse:
+    # items: list[PrescriptionItem] = prescription.items
+    # drug_orms: list[DrugOrm] = []
+    # administration_route_orms: list[AdministrationRouteOrm] = []
+    #
+    # # Get and validate drugs and administration routes of prescription
+    # for it in items:
+    #     drug: Drug = it.drug
+    #     drug_orm: DrugOrm = await _find_drug(drug=drug, session=session)
+    #     if not drug_orm:
+    #         message: str = f"Unknown drug {drug.name}"
+    #         logger.error(message)
+    #         return OrderResponse(
+    #             message=message,
+    #             status_code=OrderStatus.UNKNOWN_DRUG,
+    #         )
+    #
+    #     administration_route = it.administration_route
+    #     administration_route_orm: AdministrationRouteOrm = await _find_administration_route(
+    #         administration_route=administration_route,
+    #         session=session
+    #     )
+    #     if not administration_route_orm:
+    #         message: str = f"Unknown administration route {administration_route.name}"
+    #         logger.error(message)
+    #         return OrderResponse(
+    #             message=message,
+    #             status_code=OrderStatus.UNKNOWN_ADMINISTRATION_ROUTE,
+    #         )
+    #
+    #     drug_orms.append(drug_orm)
+    #     administration_route_orms.append(administration_route_orm)
+    #
+    # # Create prescription
+    # doctor_orm: DoctorOrm = await _find_or_create_doctor(doctor=prescription.doctor, session=session)
+    # patient_orm: PatientOrm = await _find_or_create_patient(patient=prescription.patient, session=session)
+    # prescription_orm = PrescriptionOrm(
+    #     diagnosis=prescription.diagnosis,
+    #     patient_id=patient_orm.id,
+    #     doctor_id=doctor_orm.id,
+    #     date=prescription.date,
+    # )
+    # await _create_object(session=session, obj=prescription_orm)
+    #
+    # # Add items to prescription
+    # for i, it in enumerate(items):
+    #     drug_orm = drug_orms[i]
+    #     administration_route_orm = administration_route_orms[i]
+    #
+    #     prescription_item_orm = PrescriptionItemOrm(
+    #         prescription_id=prescription_orm.id,
+    #         drug_id=drug_orm.id,
+    #         amount=it.amount,
+    #         administration_route_id=administration_route_orm.id,
+    #     )
+    #     await _create_object(session=session, obj=prescription_item_orm)
+    #
+    # # Create order
+    # order_orm = OrderOrm(
+    #     prescription_id=prescription_orm.id,
+    #     registration_datetime=datetime.now(),
+    # )
+    # await _create_object(session=session, obj=order_orm)
+    # await session.commit()
+    #
+    # # TODO: Add business-logic (reserve drugs, start production)
+    # if len(items) > 1:
+    #     return OrderResponse(
+    #         message="Order waiting drugs", status=OrderStatus.WAITING_PRODUCTION_OR_SUPPLY, order_id=order_orm.id
+    #     )
 
     return OrderResponse(message="Order created", status=OrderStatus.CREATED, order_id=order_orm.id)
 
@@ -154,45 +150,46 @@ async def get_orders_in_production(session: AsyncSession = Depends(get_session))
 
 @router.post("/{order_id}/customers")
 async def set_order_customer(
-    order_id: int, customer: Customer, session: AsyncSession = Depends(get_session)
+    order_id: int, customer_id: int, session: AsyncSession = Depends(get_session)
 ) -> OrderResponse:
-    try:
-        order: Optional[OrderOrm] = await _find_order_by_id(order_id=order_id, session=session)
-    except Exception as e:
-        logger.error("Searching for order %s failed", order_id, exc_info=e)
-        return create_order_internal_error_response(
-            order_id=order_id,
-        )
-
-    if order is None:
-        _log_order_not_found(order_id)
-        return create_order_not_found_response(order_id)
-
-    try:
-        customer_orm: CustomerOrm = await _find_or_create_customer(customer=customer, session=session)
-    except Exception as e:
-        logger.error(
-            f"Invalid customer (%s, %s, %s)",
-            customer.full_name,
-            customer.phone_number,
-            customer.address,
-            exc_info=e
-        )
-        return OrderResponse(
-            message="Invalid customer",
-            status=OrderStatus.INVALID_CUSTOMER,
-            order_id=order_id,
-        )
-
-    try:
-        order.customer_id = customer_orm.id
-        await session.commit()
-        return create_order_success_response(order_id)
-    except Exception as e:
-        logger.error(f"Failed to assign customer {customer_orm.id} to order {order_id}", exc_info=e)
-        return create_order_internal_error_response(
-            order_id=order_id,
-        )
+    # try:
+    #     order: Optional[OrderOrm] = await _find_order_by_id(order_id=order_id, session=session)
+    # except Exception as e:
+    #     logger.error("Searching for order %s failed", order_id, exc_info=e)
+    #     return create_order_internal_error_response(
+    #         order_id=order_id,
+    #     )
+    #
+    # if order is None:
+    #     _log_order_not_found(order_id)
+    #     return create_order_not_found_response(order_id)
+    #
+    # try:
+    #     customer_orm: CustomerOrm = await _find_or_create_customer(customer=customer, session=session)
+    # except Exception as e:
+    #     logger.error(
+    #         f"Invalid customer (%s, %s, %s)",
+    #         customer.full_name,
+    #         customer.phone_number,
+    #         customer.address,
+    #         exc_info=e
+    #     )
+    #     return OrderResponse(
+    #         message="Invalid customer",
+    #         status=OrderStatus.INVALID_CUSTOMER,
+    #         order_id=order_id,
+    #     )
+    #
+    # try:
+    #     order.customer_id = customer_orm.id
+    #     await session.commit()
+    #     return create_order_success_response(order_id)
+    # except Exception as e:
+    #     logger.error(f"Failed to assign customer {customer_orm.id} to order {order_id}", exc_info=e)
+    #     return create_order_internal_error_response(
+    #         order_id=order_id,
+    #     )
+    pass
 
 
 @router.delete("/{order_id}/customers")
@@ -379,10 +376,6 @@ async def _find_administration_route(
     return candidates[0] if candidates else None
 
 
-async def _create_object(session: AsyncSession, obj: Base) -> None:
-    session.add(obj)
-    await session.flush()
-    await session.refresh(obj)
 
 
 def _get_forgotten_orders_query_string() -> str:

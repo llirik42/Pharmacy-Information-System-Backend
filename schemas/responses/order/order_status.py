@@ -13,7 +13,7 @@ class OrderStatus(IntEnum):
     CANNOT_ASSIGN_CUSTOMER = (8,)
     CUSTOMER_NOT_ASSIGNED = (9,)
     INVALID_CUSTOMER = (10,)
-    INVALID_DOCTOR = (11,),
+    INVALID_DOCTOR = (11,)
 
     CANNOT_DELETE_CUSTOMER = (11,)
     CANNOT_BE_PAID = (12,)
