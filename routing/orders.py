@@ -20,7 +20,6 @@ from models import (
 )
 from schemas import (
     Order,
-    CustomerOrder,
     Prescription,
     Customer,
     Doctor,
@@ -115,16 +114,16 @@ async def get_orders(session: AsyncSession = Depends(get_session)) -> list[Order
 
 
 @router.get("/forgotten")
-async def get_forgotten_orders(session: AsyncSession = Depends(get_session)) -> list[CustomerOrder]:
+async def get_forgotten_orders(session: AsyncSession = Depends(get_session)) -> list[Order]:
     query = text(_get_forgotten_orders_query_string())
     query_result = await session.execute(query)
 
-    forgotten_orders: list[CustomerOrder] = []
+    forgotten_orders: list[Order] = []
 
     for row in query_result:
         order_id: int = row[0]
-        customer_order = await session.get(OrderOrm, ident=order_id)
-        forgotten_orders.append(CustomerOrder.model_validate(customer_order))
+        order_orm = await session.get(OrderOrm, ident=order_id)
+        forgotten_orders.append(Order.model_validate(order_orm))
 
     return forgotten_orders
 

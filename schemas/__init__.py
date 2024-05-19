@@ -18,7 +18,6 @@ __all__ = [
     "PrescriptionItem",
     "UsedDrug",
     "StoredDrug",
-    "CustomerOrder",
     "ProductionComponent",
 ]
 
@@ -39,7 +38,6 @@ from .base.supplier import Supplier
 from .base.supply import Supply
 from .base.technology import Technology
 from .base.technology_component import TechnologyComponent
-from .customer_order import CustomerOrder
 from .frequent_customer import FrequentCustomer
 from .production_component import ProductionComponent
 from .stored_drug import StoredDrug
