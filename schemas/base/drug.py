@@ -5,7 +5,7 @@ from .drug_type import DrugType
 
 
 class Drug(Base):
-    id: int
+    id: int = Field(ge=1)
     name: str = Field(max_length=256)
     cost: int = Field(ge=1)
     shelf_life: int = Field(ge=1)

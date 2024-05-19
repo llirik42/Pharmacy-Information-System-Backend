@@ -7,6 +7,7 @@ from .drug import Drug
 
 
 class StorageItem(Base):
+    id: int = Field(ge=1)
     drug: Drug
     available_amount: int = Field(ge=0)
     original_amount: int = Field(ge=1)

@@ -9,6 +9,7 @@ from .technology import Technology
 
 
 class Production(Base):
+    id: int = Field(ge=1)
     order: Order
     technology: Technology
     drug_amount: int = Field(ge=1)

@@ -9,6 +9,7 @@ from .supplier import Supplier
 
 
 class Supply(Base):
+    id: int = Field(ge=1)
     drug: Drug
     drug_amount: int = Field(ge=1)
     cost: int = Field(ge=0)

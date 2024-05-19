@@ -8,6 +8,7 @@ from .technology_component import TechnologyComponent
 
 
 class Technology(Base):
+    id: int = Field(ge=1)
     drug: Drug
     cooking_time: time
     amount: int = Field(ge=1)
