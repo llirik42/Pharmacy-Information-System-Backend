@@ -1,3 +1,5 @@
+import datetime
+
 from pydantic import Field
 
 from .base import Base
@@ -10,4 +12,5 @@ class Prescription(Base):
     diagnosis: str = Field(max_length=512)
     patient: Patient
     doctor: Doctor
+    date: datetime.date
     items: list[PrescriptionItem]

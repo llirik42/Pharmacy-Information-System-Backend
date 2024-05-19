@@ -64,7 +64,7 @@ async def get_minimal_amount_drugs(
     for row in query_result:
         drug_id: int = row[0]
         drug_orm = await session.get(DrugOrm, ident=drug_id)
-        minimal_amount_drugs.append(StoredDrug(drug=Drug.model_validate(drug_orm), stored_count=row[1]))
+        minimal_amount_drugs.append(StoredDrug(drug=Drug.model_validate(drug_orm), stored_number=row[1]))
 
     return minimal_amount_drugs
 
