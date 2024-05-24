@@ -4,7 +4,7 @@ from sqlalchemy.orm import Mapped, mapped_column
 from .base import Base
 
 
-class DrugTypeAdministrationRouteOrm(Base):
+class DrugTypeAdministrationRoute(Base):
     __tablename__ = "drug_types_administration_routes"
 
     type_id: Mapped[int] = mapped_column(ForeignKey("drug_types.id"), primary_key=True)

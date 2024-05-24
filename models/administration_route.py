@@ -4,7 +4,7 @@ from sqlalchemy.orm import mapped_column, Mapped
 from .base import Base
 
 
-class AdministrationRouteOrm(Base):
+class AdministrationRoute(Base):
     __tablename__ = "administration_routes"
 
     id: Mapped[int] = mapped_column(primary_key=True)

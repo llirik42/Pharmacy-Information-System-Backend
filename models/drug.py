@@ -2,10 +2,10 @@ from sqlalchemy import String, ForeignKey, CheckConstraint
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from .base import Base
-from .drug_type import DrugTypeOrm
+from .drug_type import DrugType
 
 
-class DrugOrm(Base):
+class Drug(Base):
     __tablename__ = "drugs"
 
     id: Mapped[int] = mapped_column(primary_key=True)
@@ -15,7 +15,7 @@ class DrugOrm(Base):
     critical_amount: Mapped[int] = mapped_column()
     type_id: Mapped[int] = mapped_column(ForeignKey("drug_types.id"))
     description: Mapped[str] = mapped_column(String(256))
-    drug_type: Mapped[DrugTypeOrm] = relationship(lazy="joined")
+    drug_type: Mapped[DrugType] = relationship(lazy="joined")
 
     __table_args__ = (
         CheckConstraint("cost > 0"),

@@ -4,11 +4,11 @@ from sqlalchemy import ForeignKey, CheckConstraint, String
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from .base import Base
-from .drug import DrugOrm
-from .technology_component import TechnologyComponentOrm
+from .drug import Drug
+from .technology_component import TechnologyComponent
 
 
-class TechnologyOrm(Base):
+class Technology(Base):
     __tablename__ = "technologies"
 
     id: Mapped[int] = mapped_column(primary_key=True)
@@ -16,7 +16,7 @@ class TechnologyOrm(Base):
     cooking_time: Mapped[time] = mapped_column()
     amount: Mapped[int] = mapped_column()
     description: Mapped[str] = mapped_column(String(256))
-    drug: Mapped[DrugOrm] = relationship(lazy="joined")
-    components: Mapped[list[TechnologyComponentOrm]] = relationship(lazy="joined")
+    drug: Mapped[Drug] = relationship(lazy="joined")
+    components: Mapped[list[TechnologyComponent]] = relationship(lazy="joined")
 
     __table_args__ = (CheckConstraint("amount > 0"),)

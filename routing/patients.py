@@ -1,25 +1,19 @@
 import logging
-from datetime import datetime
 
 from fastapi import Depends, APIRouter
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from db import get_session
-from models import PatientOrm
-from schemas import Patient
+from models import Patient
+from schemas.entities import PatientSchema
 
 router = APIRouter(prefix="/patients")
 logger = logging.getLogger("patients")
 
 
-@router.post("/")
-async def create_patient(full_name: str, birthday: datetime, session: AsyncSession = Depends(get_session)):
-    pass
-
-
 @router.get("/")
-async def get_patients(session: AsyncSession = Depends(get_session)) -> list[Patient]:
-    query = select(PatientOrm)
+async def get_patients(session: AsyncSession = Depends(get_session)) -> list[PatientSchema]:
+    query = select(Patient)
     query_result = await session.execute(query)
-    return [Patient.model_validate(p) for p in query_result.scalars().all()]
+    return [PatientSchema.model_validate(patient) for patient in query_result.scalars().all()]

@@ -3,26 +3,26 @@ from sqlalchemy import text
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from db import get_session
-from models import DrugOrm
-from schemas import ProductionComponent, Drug
+from models import Drug
+from schemas.entities import ProductionComponentSchema, DrugSchema
 
 router = APIRouter(prefix="/production")
 
 
 @router.get("/components")
-async def get_production_components(session: AsyncSession = Depends(get_session)) -> list[ProductionComponent]:
+async def get_production_components(session: AsyncSession = Depends(get_session)) -> list[ProductionComponentSchema]:
     query = text(_get_production_components_query_string())
     query_result = await session.execute(query)
 
-    production_components: list[ProductionComponent] = []
+    production_components: list[ProductionComponentSchema] = []
 
     for row in query_result:
         drug_id: int = row[0]
-        drug_orm = await session.get(DrugOrm, ident=drug_id)
+        drug_orm = await session.get(Drug, ident=drug_id)
 
         production_components.append(
-            ProductionComponent(
-                component=Drug.model_validate(drug_orm),
+            ProductionComponentSchema(
+                component=DrugSchema.model_validate(drug_orm),
                 component_amount=row[1],
             )
         )

@@ -1,11 +1,8 @@
-from datetime import date
-
 from pydantic import Field
 
-from .base import Base
+from .base import BaseSchema
 
 
-class Patient(Base):
+class LabWorkerSchema(BaseSchema):
     id: int = Field(ge=1)
     full_name: str = Field(max_length=256)
-    birthday: date

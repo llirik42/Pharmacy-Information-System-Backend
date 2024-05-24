@@ -5,6 +5,7 @@ from typing import Optional
 import starlette
 import starlette.datastructures
 from fastapi import FastAPI
+from sqladmin import Admin
 from starlette.requests import Request
 
 import routing.customers
@@ -16,6 +17,8 @@ import routing.patients
 import routing.production
 import routing.technologies
 from db import engine
+
+from views import AdministrationRouteView
 
 
 @asynccontextmanager
@@ -42,6 +45,9 @@ app.include_router(routing.doctors.router)
 app.include_router(routing.patients.router)
 app.include_router(routing.technologies.router)
 app.include_router(routing.production.router)
+
+admin = Admin(app=app, engine=engine)
+admin.add_model_view(AdministrationRouteView)
 
 
 @app.middleware("http")

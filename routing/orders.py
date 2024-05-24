@@ -8,21 +8,21 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from db import get_session
 from models import (
-    OrderOrm,
-    CustomerOrm,
-    DoctorOrm,
-    PatientOrm,
-    Base,
-    DrugOrm,
-    AdministrationRouteOrm,
-)
-from schemas import (
     Order,
     Customer,
     Doctor,
     Patient,
+    Base,
     Drug,
     AdministrationRoute,
+)
+from schemas import (
+    OrderSchema,
+    CustomerSchema,
+    DoctorSchema,
+    PatientSchema,
+    DrugSchema,
+    AdministrationRouteSchema,
 )
 from schemas.responses import (
     OrderStatus,
@@ -112,38 +112,38 @@ async def create_order(prescription_id: int, session: AsyncSession = Depends(get
 
 
 @router.get("/")
-async def get_orders(session: AsyncSession = Depends(get_session)) -> list[Order]:
-    query = select(OrderOrm)
+async def get_orders(session: AsyncSession = Depends(get_session)) -> list[OrderSchema]:
+    query = select(Order)
     query_result = await session.execute(query)
-    return [Order.model_validate(order_orm) for order_orm in query_result.unique().scalars().all()]
+    return [OrderSchema.model_validate(order_orm) for order_orm in query_result.unique().scalars().all()]
 
 
 @router.get("/forgotten")
-async def get_forgotten_orders(session: AsyncSession = Depends(get_session)) -> list[Order]:
+async def get_forgotten_orders(session: AsyncSession = Depends(get_session)) -> list[OrderSchema]:
     query = text(_get_forgotten_orders_query_string())
     query_result = await session.execute(query)
 
-    forgotten_orders: list[Order] = []
+    forgotten_orders: list[OrderSchema] = []
 
     for row in query_result:
         order_id: int = row[0]
-        order_orm = await session.get(OrderOrm, ident=order_id)
-        forgotten_orders.append(Order.model_validate(order_orm))
+        order_orm = await session.get(Order, ident=order_id)
+        forgotten_orders.append(OrderSchema.model_validate(order_orm))
 
     return forgotten_orders
 
 
 @router.get("/production")
-async def get_orders_in_production(session: AsyncSession = Depends(get_session)) -> list[Order]:
+async def get_orders_in_production(session: AsyncSession = Depends(get_session)) -> list[OrderSchema]:
     query = text(_get_orders_in_production_query_string())
     query_result = await session.execute(query)
 
-    orders_in_production: list[Order] = []
+    orders_in_production: list[OrderSchema] = []
 
     for row in query_result:
         order_id: int = row[0]
-        order_orm = await session.get(OrderOrm, ident=order_id)
-        orders_in_production.append(Order.model_validate(order_orm))
+        order_orm = await session.get(Order, ident=order_id)
+        orders_in_production.append(OrderSchema.model_validate(order_orm))
 
     return orders_in_production
 
@@ -195,7 +195,7 @@ async def set_order_customer(
 @router.delete("/{order_id}/customers")
 async def delete_order_customer(order_id: int, session: AsyncSession = Depends(get_session)) -> OrderResponse:
     try:
-        order: Optional[OrderOrm] = await _find_order_by_id(order_id=order_id, session=session)
+        order: Optional[Order] = await _find_order_by_id(order_id=order_id, session=session)
     except Exception as e:
         logger.error("Searching for order %s failed", order_id, exc_info=e)
         return create_order_internal_error_response(
@@ -230,7 +230,7 @@ async def delete_order_customer(order_id: int, session: AsyncSession = Depends(g
 @router.post("/{order_id}/pay")
 async def pay_for_order(order_id: int, session: AsyncSession = Depends(get_session)) -> OrderResponse:
     try:
-        order: Optional[OrderOrm] = await _find_order_by_id(order_id=order_id, session=session)
+        order: Optional[Order] = await _find_order_by_id(order_id=order_id, session=session)
     except Exception as e:
         logger.error("Searching for order %s failed", order_id, exc_info=e)
         return create_order_internal_error_response(
@@ -265,7 +265,7 @@ async def pay_for_order(order_id: int, session: AsyncSession = Depends(get_sessi
 @router.post("/{order_id}/obtain")
 async def obtain_order(order_id: int, session: AsyncSession = Depends(get_session)) -> OrderResponse:
     try:
-        order: Optional[OrderOrm] = await _find_order_by_id(order_id=order_id, session=session)
+        order: Optional[Order] = await _find_order_by_id(order_id=order_id, session=session)
     except Exception as e:
         logger.error("Searching for order %s failed", order_id, exc_info=e)
         return create_order_internal_error_response(
@@ -297,19 +297,19 @@ async def obtain_order(order_id: int, session: AsyncSession = Depends(get_sessio
         )
 
 
-async def _find_order_by_id(order_id: int, session: AsyncSession) -> Optional[OrderOrm]:
-    return await session.get(OrderOrm, ident=order_id)
+async def _find_order_by_id(order_id: int, session: AsyncSession) -> Optional[Order]:
+    return await session.get(Order, ident=order_id)
 
 
-async def _find_or_create_patient(patient: Patient, session: AsyncSession) -> PatientOrm:
-    query = select(PatientOrm).where(PatientOrm.full_name == patient.full_name, PatientOrm.birthday == patient.birthday)
+async def _find_or_create_patient(patient: PatientSchema, session: AsyncSession) -> Patient:
+    query = select(Patient).where(Patient.full_name == patient.full_name, Patient.birthday == patient.birthday)
     query_result = await session.execute(query)
     candidates = query_result.scalars().all()
 
     if candidates:
         return candidates[0]
 
-    patient_orm = PatientOrm(
+    patient_orm = Patient(
         full_name=patient.full_name,
         birthday=patient.birthday,
     )
@@ -318,9 +318,9 @@ async def _find_or_create_patient(patient: Patient, session: AsyncSession) -> Pa
     return patient_orm
 
 
-async def _find_or_create_doctor(doctor: Doctor, session: AsyncSession) -> DoctorOrm:
-    query = select(DoctorOrm).where(
-        DoctorOrm.full_name == doctor.full_name,
+async def _find_or_create_doctor(doctor: DoctorSchema, session: AsyncSession) -> Doctor:
+    query = select(Doctor).where(
+        Doctor.full_name == doctor.full_name,
     )
     query_result = await session.execute(query)
     candidates = query_result.scalars().all()
@@ -328,7 +328,7 @@ async def _find_or_create_doctor(doctor: Doctor, session: AsyncSession) -> Docto
     if candidates:
         return candidates[0]
 
-    doctor_orm = DoctorOrm(
+    doctor_orm = Doctor(
         full_name=doctor.full_name,
     )
     await _create_object(session=session, obj=doctor_orm)
@@ -336,11 +336,11 @@ async def _find_or_create_doctor(doctor: Doctor, session: AsyncSession) -> Docto
     return doctor_orm
 
 
-async def _find_or_create_customer(customer: Customer, session: AsyncSession) -> CustomerOrm:
-    query = select(CustomerOrm).where(
-        CustomerOrm.full_name == customer.full_name,
-        CustomerOrm.phone_number == customer.phone_number,
-        CustomerOrm.address == customer.address,
+async def _find_or_create_customer(customer: CustomerSchema, session: AsyncSession) -> Customer:
+    query = select(Customer).where(
+        Customer.full_name == customer.full_name,
+        Customer.phone_number == customer.phone_number,
+        Customer.address == customer.address,
     )
     query_result = await session.execute(query)
     candidates = query_result.scalars().all()
@@ -348,7 +348,7 @@ async def _find_or_create_customer(customer: Customer, session: AsyncSession) ->
     if candidates:
         return candidates[0]
 
-    customer_orm = CustomerOrm(
+    customer_orm = Customer(
         full_name=customer.full_name,
         phone_number=customer.phone_number,
         address=customer.address,
@@ -358,8 +358,8 @@ async def _find_or_create_customer(customer: Customer, session: AsyncSession) ->
     return customer_orm
 
 
-async def _find_drug(drug: Drug, session: AsyncSession) -> Optional[DrugOrm]:
-    query = select(DrugOrm).where(DrugOrm.name == drug.name)
+async def _find_drug(drug: DrugSchema, session: AsyncSession) -> Optional[Drug]:
+    query = select(Drug).where(Drug.name == drug.name)
     query_result = await session.execute(query)
     candidates = query_result.scalars().all()
 
@@ -367,9 +367,9 @@ async def _find_drug(drug: Drug, session: AsyncSession) -> Optional[DrugOrm]:
 
 
 async def _find_administration_route(
-    administration_route: AdministrationRoute, session: AsyncSession
-) -> Optional[AdministrationRouteOrm]:
-    query = select(AdministrationRouteOrm).where(AdministrationRouteOrm.description == administration_route.description)
+    administration_route: AdministrationRouteSchema, session: AsyncSession
+) -> Optional[AdministrationRoute]:
+    query = select(AdministrationRoute).where(AdministrationRoute.description == administration_route.description)
     query_result = await session.execute(query)
     candidates = query_result.scalars().all()
 

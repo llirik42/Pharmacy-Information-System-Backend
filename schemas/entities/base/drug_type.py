@@ -1,9 +1,9 @@
 from pydantic import Field
 
-from .base import Base
+from .base import BaseSchema
 
 
-class Supplier(Base):
+class DrugTypeSchema(BaseSchema):
     id: int = Field(ge=1)
     name: str = Field(max_length=256)
-    phone_number: str = Field(max_length=32)
+    cookable: bool

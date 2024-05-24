@@ -1,60 +1,60 @@
 __all__ = [
     "Base",
-    "AdministrationRouteOrm",
-    "CustomerOrm",
-    "DoctorOrm",
-    "DrugTypeOrm",
-    "DrugTypeAdministrationRouteOrm",
-    "DrugOrm",
-    "LabWorkerOrm",
-    "MixtureTypeOrm",
-    "MixtureOrm",
-    "PatientOrm",
-    "PillOrm",
-    "PowderOrm",
-    "PrescriptionOrm",
-    "PrescriptionItemOrm",
-    "SalveOrm",
-    "SolutionOrm",
-    "TinctureOrm",
-    "OrderOrm",
-    "StorageItemOrm",
-    "SupplierOrm",
-    "SupplyOrm",
-    "TechnologyOrm",
-    "ProductionOrm",
-    "OrderWaitingDrugSupplyOrm",
-    "ReservedDrugOrm",
-    "ProductionLabWorkerOrm",
-    "TechnologyComponentOrm",
+    "AdministrationRoute",
+    "Customer",
+    "Doctor",
+    "DrugType",
+    "DrugTypeAdministrationRoute",
+    "Drug",
+    "LabWorker",
+    "MixtureType",
+    "Mixture",
+    "Patient",
+    "Pill",
+    "Powder",
+    "Prescription",
+    "PrescriptionItem",
+    "Salve",
+    "Solution",
+    "Tincture",
+    "Order",
+    "StorageItem",
+    "Supplier",
+    "Supply",
+    "Technology",
+    "Production",
+    "OrderWaitingDrugSupply",
+    "ReservedDrug",
+    "ProductionLabWorker",
+    "TechnologyComponent",
 ]
 
-from .administration_route import AdministrationRouteOrm
+from .administration_route import AdministrationRoute
 from .base import Base
-from .customer import CustomerOrm
-from .doctor import DoctorOrm
-from .drug import DrugOrm
-from .drug_type import DrugTypeOrm
-from .drug_type_administration_route import DrugTypeAdministrationRouteOrm
-from .drug_type_administration_route import DrugTypeAdministrationRouteOrm
-from .lab_worker import LabWorkerOrm
-from .mixture import MixtureOrm
-from .mixture_type import MixtureTypeOrm
-from .order import OrderOrm
-from .order_waiting_drug_supply import OrderWaitingDrugSupplyOrm
-from .patient import PatientOrm
-from .pill import PillOrm
-from .powder import PowderOrm
-from .prescription import PrescriptionOrm
-from .prescription_item import PrescriptionItemOrm
-from .production import ProductionOrm
-from .production_lab_worker import ProductionLabWorkerOrm
-from .reserved_drug import ReservedDrugOrm
-from .salve import SalveOrm
-from .solution import SolutionOrm
-from .storage_item import StorageItemOrm
-from .suppliers import SupplierOrm
-from .supply import SupplyOrm
-from .technology import TechnologyOrm
-from .technology_component import TechnologyComponentOrm
-from .tincture import TinctureOrm
+from .customer import Customer
+from .doctor import Doctor
+from .drug import Drug
+from .drug_type import DrugType
+from .drug_type_administration_route import DrugTypeAdministrationRoute
+from .drug_type_administration_route import DrugTypeAdministrationRoute
+from .lab_worker import LabWorker
+from .mixture import Mixture
+from .mixture_type import MixtureType
+from .order import Order
+from .order_waiting_drug_supply import OrderWaitingDrugSupply
+from .patient import Patient
+from .pill import Pill
+from .powder import Powder
+from .prescription import Prescription
+from .prescription_item import PrescriptionItem
+from .production import Production
+from .production_lab_worker import ProductionLabWorker
+from .reserved_drug import ReservedDrug
+from .salve import Salve
+from .solution import Solution
+from .storage_item import StorageItem
+from .suppliers import Supplier
+from .supply import Supply
+from .technology import Technology
+from .technology_component import TechnologyComponent
+from .tincture import Tincture

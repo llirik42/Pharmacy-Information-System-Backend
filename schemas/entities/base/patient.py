@@ -1,0 +1,11 @@
+from datetime import date
+
+from pydantic import Field
+
+from .base import BaseSchema
+
+
+class PatientSchema(BaseSchema):
+    id: int = Field(ge=1)
+    full_name: str = Field(max_length=256)
+    birthday: date

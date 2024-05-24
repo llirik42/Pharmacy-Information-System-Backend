@@ -3,16 +3,16 @@ from typing import Optional
 
 from pydantic import Field
 
-from .base import Base
-from .drug import Drug
-from .supplier import Supplier
+from .base import BaseSchema
+from .drug import DrugSchema
+from .supplier import SupplierSchema
 
 
-class Supply(Base):
+class SupplySchema(BaseSchema):
     id: int = Field(ge=1)
-    drug: Drug
+    drug: DrugSchema
     drug_amount: int = Field(ge=1)
     cost: int = Field(ge=0)
     assigned_datetime: datetime
     delivery_datetime: Optional[datetime] = None
-    supplier: Supplier
+    supplier: SupplierSchema

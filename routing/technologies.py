@@ -5,8 +5,8 @@ from sqlalchemy import text
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from db import get_session
-from models import TechnologyOrm
-from schemas import Technology
+from models import Technology
+from schemas.entities import TechnologySchema
 
 router = APIRouter(prefix="/technologies")
 
@@ -17,18 +17,18 @@ async def get_technologies(
     drug_type_id: Optional[int] = None,
     in_production: bool = False,
     session: AsyncSession = Depends(get_session),
-) -> list[Technology]:
+) -> list[TechnologySchema]:
     query = text(
         _get_technologies_query_string(drug_id=drug_id, drug_type_id=drug_type_id, in_production=in_production)
     )
     query_result = await session.execute(query)
 
-    technologies: list[Technology] = []
+    technologies: list[TechnologySchema] = []
 
     for row in query_result:
         technology_id: int = row[0]
-        technology_orm = await session.get(TechnologyOrm, ident=technology_id)
-        technologies.append(Technology.model_validate(technology_orm))
+        technology_orm = await session.get(Technology, ident=technology_id)
+        technologies.append(TechnologySchema.model_validate(technology_orm))
 
     return technologies
 

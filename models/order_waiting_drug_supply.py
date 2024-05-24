@@ -4,7 +4,7 @@ from sqlalchemy.orm import Mapped, mapped_column
 from .base import Base
 
 
-class OrderWaitingDrugSupplyOrm(Base):
+class OrderWaitingDrugSupply(Base):
     __tablename__ = "orders_waiting_drug_supplies"
 
     order_id: Mapped[int] = mapped_column(ForeignKey("prescriptions.id"), primary_key=True)

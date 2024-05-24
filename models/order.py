@@ -4,12 +4,12 @@ from typing import Optional
 from sqlalchemy import ForeignKey
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
-from . import CustomerOrm
+from . import Customer
 from .base import Base
-from .prescription import PrescriptionOrm
+from .prescription import Prescription
 
 
-class OrderOrm(Base):
+class Order(Base):
     __tablename__ = "orders"
 
     id: Mapped[int] = mapped_column(primary_key=True)
@@ -19,5 +19,5 @@ class OrderOrm(Base):
     obtaining_datetime: Mapped[datetime] = mapped_column(nullable=True)
     paid: Mapped[bool] = mapped_column(default=False)
     customer_id: Mapped[int] = mapped_column(ForeignKey("customers.id"), nullable=True, default=None)
-    prescription: Mapped[PrescriptionOrm] = relationship(lazy="joined")
-    customer: Mapped[Optional[CustomerOrm]] = relationship(lazy="joined")
+    prescription: Mapped[Prescription] = relationship(lazy="joined")
+    customer: Mapped[Optional[Customer]] = relationship(lazy="joined")

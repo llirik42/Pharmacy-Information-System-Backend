@@ -3,15 +3,15 @@ from typing import Optional
 
 from pydantic import Field
 
-from .base import Base
-from .order import Order
-from .technology import Technology
+from .base import BaseSchema
+from .order import OrderSchema
+from .technology import TechnologySchema
 
 
-class Production(Base):
+class ProductionSchema(BaseSchema):
     id: int = Field(ge=1)
-    order: Order
-    technology: Technology
+    order: OrderSchema
+    technology: TechnologySchema
     drug_amount: int = Field(ge=1)
     start: Optional[datetime] = None
     end: Optional[datetime] = None

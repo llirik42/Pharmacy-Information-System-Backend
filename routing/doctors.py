@@ -6,9 +6,9 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from db import get_session
-from models import DoctorOrm
+from models import Doctor
 from routing.utils import create_object
-from schemas import Doctor
+from schemas import DoctorSchema
 from schemas.responses.doctor import DoctorResponse, DoctorResponseStatus
 
 router = APIRouter(prefix="/doctors")
@@ -17,12 +17,12 @@ logger = logging.getLogger("doctors")
 
 @router.post("/")
 async def create_doctor(full_name: str, session: AsyncSession = Depends(get_session)) -> DoctorResponse:
-    doctor_orm = DoctorOrm(full_name=full_name)
+    doctor_orm = Doctor(full_name=full_name)
 
     try:
         await create_object(obj=doctor_orm, session=session)
         return DoctorResponse(
-            doctor=Doctor.model_validate(doctor_orm)
+            doctor=DoctorSchema.model_validate(doctor_orm)
         )
     except Exception as e:
         logger.error("Creating customer (%s) failed", full_name, exc_info=e)
@@ -32,15 +32,15 @@ async def create_doctor(full_name: str, session: AsyncSession = Depends(get_sess
 
 
 @router.get("/")
-async def get_doctors(session: AsyncSession = Depends(get_session)) -> list[Doctor]:
-    query = select(DoctorOrm)
+async def get_doctors(session: AsyncSession = Depends(get_session)) -> list[DoctorSchema]:
+    query = select(Doctor)
     query_result = await session.execute(query)
-    return [Doctor.model_validate(doctor_orm) for doctor_orm in query_result.scalars().all()]
+    return [DoctorSchema.model_validate(doctor_orm) for doctor_orm in query_result.scalars().all()]
 
 
 @router.get("/")
 async def find_doctor(doctor_id: int, session: AsyncSession = Depends(get_session)) -> DoctorResponse:
-    doctor_orm: Optional[DoctorOrm] = await session.get(DoctorOrm, ident=doctor_id)
+    doctor_orm: Optional[Doctor] = await session.get(Doctor, ident=doctor_id)
 
     if doctor_orm is None:
         logger.error("Doctor %s not found", doctor_id)
@@ -49,5 +49,5 @@ async def find_doctor(doctor_id: int, session: AsyncSession = Depends(get_sessio
         )
 
     return DoctorResponse(
-        doctor=Doctor.model_validate(doctor_orm)
+        doctor=DoctorSchema.model_validate(doctor_orm)
     )

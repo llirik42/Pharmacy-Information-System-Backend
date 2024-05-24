@@ -4,12 +4,12 @@ from sqlalchemy import String, ForeignKey, Date
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from .base import Base
-from .doctor import DoctorOrm
-from .patient import PatientOrm
-from .prescription_item import PrescriptionItemOrm
+from .doctor import Doctor
+from .patient import Patient
+from .prescription_item import PrescriptionItem
 
 
-class PrescriptionOrm(Base):
+class Prescription(Base):
     __tablename__ = "prescriptions"
 
     id: Mapped[int] = mapped_column(primary_key=True)
@@ -17,12 +17,12 @@ class PrescriptionOrm(Base):
     patient_id: Mapped[int] = mapped_column(ForeignKey("patients.id"))
     doctor_id: Mapped[int] = mapped_column(ForeignKey("doctors.id"))
     date: Mapped[date] = mapped_column(Date())
-    items: Mapped[list[PrescriptionItemOrm]] = relationship(
+    items: Mapped[list[PrescriptionItem]] = relationship(
         lazy="joined",
     )
-    patient: Mapped[PatientOrm] = relationship(
+    patient: Mapped[Patient] = relationship(
         lazy="joined",
     )
-    doctor: Mapped[DoctorOrm] = relationship(
+    doctor: Mapped[Doctor] = relationship(
         lazy="joined",
     )

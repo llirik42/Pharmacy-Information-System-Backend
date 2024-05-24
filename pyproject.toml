@@ -11,6 +11,7 @@ alembic = "^1.13.1"
 aiomysql = "^0.2.0"
 black = "^24.4.2"
 mypy = "^1.10.0"
+sqladmin = {extras = ["full"], version = "^0.17.0"}
 
 [build-system]
 requires = ["poetry-core"]

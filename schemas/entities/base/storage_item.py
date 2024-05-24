@@ -2,13 +2,13 @@ from datetime import datetime
 
 from pydantic import Field
 
-from .base import Base
-from .drug import Drug
+from .base import BaseSchema
+from .drug import DrugSchema
 
 
-class StorageItem(Base):
+class StorageItemSchema(BaseSchema):
     id: int = Field(ge=1)
-    drug: Drug
+    drug: DrugSchema
     available_amount: int = Field(ge=0)
     original_amount: int = Field(ge=1)
     receipt_datetime: datetime

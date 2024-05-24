@@ -3,30 +3,30 @@ from sqlalchemy import select, text
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from db import get_session
-from models import DrugTypeOrm
-from schemas import DrugType
+from models import DrugType
+from schemas import DrugTypeSchema
 
 router = APIRouter(prefix="/drug-types")
 
 
 @router.get("/")
-async def get_drug_types(session: AsyncSession = Depends(get_session)) -> list[DrugType]:
-    query = select(DrugTypeOrm)
+async def get_drug_types(session: AsyncSession = Depends(get_session)) -> list[DrugTypeSchema]:
+    query = select(DrugType)
     query_result = await session.execute(query)
-    return [DrugType.model_validate(drug_type_orm) for drug_type_orm in query_result.scalars().all()]
+    return [DrugTypeSchema.model_validate(drug_type_orm) for drug_type_orm in query_result.scalars().all()]
 
 
 @router.get("/critical-amount")
-async def get_critical_amount_drug_types(session: AsyncSession = Depends(get_session)) -> list[DrugType]:
+async def get_critical_amount_drug_types(session: AsyncSession = Depends(get_session)) -> list[DrugTypeSchema]:
     query = text(_get_critical_amount_drug_types_query_string())
     query_result = await session.execute(query)
 
-    critical_amount_drug_types: list[DrugType] = []
+    critical_amount_drug_types: list[DrugTypeSchema] = []
 
     for row in query_result:
         drug_type_id: int = row[0]
-        drug_type_orm = await session.get(DrugTypeOrm, ident=drug_type_id)
-        critical_amount_drug_types.append(DrugType.model_validate(drug_type_orm))
+        drug_type_orm = await session.get(DrugType, ident=drug_type_id)
+        critical_amount_drug_types.append(DrugTypeSchema.model_validate(drug_type_orm))
 
     return critical_amount_drug_types
 
