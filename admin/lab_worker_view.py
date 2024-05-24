@@ -1,9 +1,9 @@
-from sqladmin import ModelView
-
 from models import LabWorker
 
+from .base import BaseView
 
-class LabWorkerView(ModelView, model=LabWorker):
+
+class LabWorkerView(BaseView, model=LabWorker):
     column_list = [
         LabWorker.id,
         LabWorker.full_name,

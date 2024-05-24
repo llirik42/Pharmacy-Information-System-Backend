@@ -1,9 +1,9 @@
-from sqladmin import ModelView
-
 from models import Order
 
+from .base import BaseView
 
-class OrderView(ModelView, model=Order):
+
+class OrderView(BaseView, model=Order):
     column_list = [
         Order.id,
         Order.prescription_id,
@@ -11,5 +11,9 @@ class OrderView(ModelView, model=Order):
         Order.appointed_datetime,
         Order.obtaining_datetime,
         Order.paid,
-        Order.customer_id,
+        Order.customer,
     ]
+
+    column_details_exclude_list = [Order.prescription]
+
+    form_excluded_columns = [Order.prescription]

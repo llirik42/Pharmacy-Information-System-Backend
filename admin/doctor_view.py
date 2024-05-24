@@ -1,9 +1,9 @@
-from sqladmin import ModelView
-
 from models import Doctor
 
+from .base import BaseView
 
-class DoctorView(ModelView, model=Doctor):
+
+class DoctorView(BaseView, model=Doctor):
     column_list = [
         Doctor.id,
         Doctor.full_name,

@@ -22,3 +22,6 @@ class Drug(Base):
         CheckConstraint("shelf_life > 0"),
         CheckConstraint("critical_amount >= 0"),
     )
+
+    def __repr__(self) -> str:
+        return self.name

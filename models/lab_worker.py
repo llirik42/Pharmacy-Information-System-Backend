@@ -9,3 +9,6 @@ class LabWorker(Base):
 
     id: Mapped[int] = mapped_column(primary_key=True)
     full_name: Mapped[str] = mapped_column(String(256), unique=True)
+
+    def __repr__(self) -> str:
+        return self.full_name

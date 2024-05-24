@@ -1,12 +1,7 @@
-from sqladmin import ModelView
-
 from models import Customer
 
+from .base import BaseView
 
-class CustomerView(ModelView, model=Customer):
-    column_list = [
-        Customer.id,
-        Customer.full_name,
-        Customer.phone_number,
-        Customer.address
-    ]
+
+class CustomerView(BaseView, model=Customer):
+    column_list = [Customer.id, Customer.full_name, Customer.phone_number, Customer.address]

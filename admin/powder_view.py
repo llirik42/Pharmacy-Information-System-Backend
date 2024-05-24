@@ -1,10 +1,7 @@
-from sqladmin import ModelView
-
 from models import Powder
 
+from .base import BaseView
 
-class PowderView(ModelView, model=Powder):
-    column_list = [
-        Powder.drug_id,
-        Powder.composite
-    ]
+
+class PowderView(BaseView, model=Powder):
+    column_list = [Powder.drug, Powder.composite]

@@ -1,15 +1,17 @@
-from sqladmin import ModelView
-
 from models import Supply
 
+from .base import BaseView
 
-class SupplyView(ModelView, model=Supply):
+
+class SupplyView(BaseView, model=Supply):
     column_list = [
         Supply.id,
-        Supply.drug_id,
+        Supply.drug,
+        Supply.supplier,
         Supply.drug_amount,
         Supply.cost,
         Supply.assigned_datetime,
         Supply.delivery_datetime,
-        Supply.supplier_id
     ]
+
+    name_plural = "Supplies"

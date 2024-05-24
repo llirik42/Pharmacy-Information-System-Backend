@@ -1,13 +1,13 @@
-from sqladmin import ModelView
-
 from models import StorageItem
 
+from .base import BaseView
 
-class StorageItemView(ModelView, model=StorageItem):
+
+class StorageItemView(BaseView, model=StorageItem):
     column_list = [
         StorageItem.id,
-        StorageItem.drug_id,
+        StorageItem.drug,
         StorageItem.available_amount,
         StorageItem.original_amount,
-        StorageItem.receipt_datetime
+        StorageItem.receipt_datetime,
     ]

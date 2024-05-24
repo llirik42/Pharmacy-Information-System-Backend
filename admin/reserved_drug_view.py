@@ -1,11 +1,7 @@
-from sqladmin import ModelView
-
 from models import ReservedDrug
 
+from .base import BaseView
 
-class ReservedDrugView(ModelView, model=ReservedDrug):
-    column_list = [
-        ReservedDrug.order_id,
-        ReservedDrug.storage_item_id,
-        ReservedDrug.drug_amount
-    ]
+
+class ReservedDrugView(BaseView, model=ReservedDrug):
+    column_list = [ReservedDrug.order_id, ReservedDrug.storage_item_id, ReservedDrug.drug_amount]

@@ -1,11 +1,11 @@
-from sqladmin import ModelView
-
 from models import TechnologyComponent
 
+from .base import BaseView
 
-class TechnologyComponentView(ModelView, model=TechnologyComponent):
+
+class TechnologyComponentView(BaseView, model=TechnologyComponent):
     column_list = [
         TechnologyComponent.technology_id,
-        TechnologyComponent.component_id,
-        TechnologyComponent.component_amount
+        TechnologyComponent.component,
+        TechnologyComponent.component_amount,
     ]

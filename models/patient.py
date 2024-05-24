@@ -14,3 +14,6 @@ class Patient(Base):
     birthday: Mapped[date] = mapped_column(Date())
 
     __table_args__ = (UniqueConstraint("full_name", "birthday"),)
+
+    def __repr__(self) -> str:
+        return f"{self.full_name}, {self.birthday}"

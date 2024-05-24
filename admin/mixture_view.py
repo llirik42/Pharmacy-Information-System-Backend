@@ -1,11 +1,7 @@
-from sqladmin import ModelView
-
 from models import Mixture
 
+from .base import BaseView
 
-class MixtureView(ModelView, model=Mixture):
-    column_list = [
-        Mixture.drug_id,
-        Mixture.solvent,
-        Mixture.mixture_type_id
-    ]
+
+class MixtureView(BaseView, model=Mixture):
+    column_list = [Mixture.drug, Mixture.solvent, Mixture.mixture_type]

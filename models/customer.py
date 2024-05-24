@@ -13,3 +13,6 @@ class Customer(Base):
     address: Mapped[str] = mapped_column(String(256))
 
     __table_args__ = (UniqueConstraint("full_name", "phone_number", "address"),)
+
+    def __repr__(self) -> str:
+        return f"{self.full_name}, {self.phone_number}, {self.address}"

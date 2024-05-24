@@ -1,9 +1,9 @@
-from sqladmin import ModelView
-
 from models import MixtureType
 
+from .base import BaseView
 
-class MixtureTypeView(ModelView, model=MixtureType):
+
+class MixtureTypeView(BaseView, model=MixtureType):
     column_list = [
         MixtureType.id,
         MixtureType.name,

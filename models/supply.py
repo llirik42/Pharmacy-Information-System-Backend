@@ -1,8 +1,9 @@
 from datetime import datetime
 
 from sqlalchemy import ForeignKey, CheckConstraint
-from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 
+from . import Drug, Supplier
 from .base import Base
 
 
@@ -16,6 +17,8 @@ class Supply(Base):
     assigned_datetime: Mapped[datetime] = mapped_column()
     delivery_datetime: Mapped[datetime] = mapped_column(nullable=True)
     supplier_id: Mapped[int] = mapped_column(ForeignKey("suppliers.id"))
+    drug: Mapped[Drug] = relationship()
+    supplier: Mapped[Supplier] = relationship()
 
     __table_args__ = (
         CheckConstraint("drug_amount > 0"),

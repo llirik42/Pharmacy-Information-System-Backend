@@ -12,3 +12,6 @@ class Supplier(Base):
     phone_number: Mapped[str] = mapped_column(String(32))
 
     __table_args__ = (UniqueConstraint("name", "phone_number"),)
+
+    def __repr__(self) -> str:
+        return f"{self.name}, {self.phone_number}"

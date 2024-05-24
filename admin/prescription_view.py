@@ -1,13 +1,16 @@
-from sqladmin import ModelView
-
 from models import Prescription
 
+from .base import BaseView
 
-class PrescriptionView(ModelView, model=Prescription):
+
+class PrescriptionView(BaseView, model=Prescription):
     column_list = [
         Prescription.id,
-        Prescription.diagnosis,
-        Prescription.patient_id,
-        Prescription.doctor_id,
+        Prescription.patient,
+        Prescription.doctor,
         Prescription.date,
     ]
+
+    column_details_exclude_list = [Prescription.items]
+
+    form_excluded_columns = [Prescription.items]

@@ -1,10 +1,7 @@
-from sqladmin import ModelView
-
 from models import AdministrationRoute
 
+from .base import BaseView
 
-class AdministrationRouteView(ModelView, model=AdministrationRoute):
-    column_list = [
-        AdministrationRoute.id,
-        AdministrationRoute.description
-    ]
+
+class AdministrationRouteView(BaseView, model=AdministrationRoute):
+    column_list = [AdministrationRoute.id, AdministrationRoute.description]

@@ -1,13 +1,18 @@
-from sqladmin import ModelView
-
 from models import Technology
 
+from .base import BaseView
 
-class TechnologyView(ModelView, model=Technology):
+
+class TechnologyView(BaseView, model=Technology):
     column_list = [
         Technology.id,
-        Technology.drug_id,
+        Technology.drug,
         Technology.cooking_time,
         Technology.amount,
-        Technology.description,
     ]
+
+    column_details_exclude_list = [Technology.components]
+
+    form_excluded_columns = [Technology.components]
+
+    name_plural = "Technologies"

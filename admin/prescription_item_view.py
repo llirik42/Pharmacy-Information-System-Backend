@@ -1,12 +1,14 @@
-from sqladmin import ModelView
-
 from models import PrescriptionItem
 
+from .base import BaseView
 
-class PrescriptionItemView(ModelView, model=PrescriptionItem):
+
+class PrescriptionItemView(BaseView, model=PrescriptionItem):
     column_list = [
         PrescriptionItem.prescription_id,
-        PrescriptionItem.drug_id,
+        PrescriptionItem.drug,
         PrescriptionItem.amount,
-        PrescriptionItem.administration_route_id
+        PrescriptionItem.administration_route,
     ]
+
+    name_plural = "Prescriptions items"

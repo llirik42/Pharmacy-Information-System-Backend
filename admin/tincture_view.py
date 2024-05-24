@@ -1,10 +1,7 @@
-from sqladmin import ModelView
-
 from models import Tincture
 
+from .base import BaseView
 
-class TinctureView(ModelView, model=Tincture):
-    column_list = [
-        Tincture.drug_id,
-        Tincture.material
-    ]
+
+class TinctureView(BaseView, model=Tincture):
+    column_list = [Tincture.drug, Tincture.material]

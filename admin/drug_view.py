@@ -1,15 +1,15 @@
-from sqladmin import ModelView
-
 from models import Drug
 
+from .base import BaseView
 
-class DrugView(ModelView, model=Drug):
+
+class DrugView(BaseView, model=Drug):
     column_list = [
         Drug.id,
         Drug.name,
+        Drug.description,
+        Drug.drug_type,
         Drug.cost,
         Drug.shelf_life,
         Drug.critical_amount,
-        Drug.type_id,
-        Drug.description
     ]

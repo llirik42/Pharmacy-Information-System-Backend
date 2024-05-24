@@ -1,11 +1,7 @@
-from sqladmin import ModelView
-
 from models import Patient
 
+from .base import BaseView
 
-class PatientView(ModelView, model=Patient):
-    column_list = [
-        Patient.id,
-        Patient.full_name,
-        Patient.birthday
-    ]
+
+class PatientView(BaseView, model=Patient):
+    column_list = [Patient.id, Patient.full_name, Patient.birthday]

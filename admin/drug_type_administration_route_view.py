@@ -1,10 +1,12 @@
-from sqladmin import ModelView
-
 from models import DrugTypeAdministrationRoute
 
+from .base import BaseView
 
-class DrugTypeAdministrationRouteView(ModelView, model=DrugTypeAdministrationRoute):
+
+class DrugTypeAdministrationRouteView(BaseView, model=DrugTypeAdministrationRoute):
     column_list = [
-        DrugTypeAdministrationRoute.type_id,
-        DrugTypeAdministrationRoute.route_id,
+        DrugTypeAdministrationRoute.type,
+        DrugTypeAdministrationRoute.route,
     ]
+
+    name_plural = "Drug Types Administration Routes"
