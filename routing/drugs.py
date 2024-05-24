@@ -7,7 +7,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from db import get_session
 from models import Drug
-from schemas import StoredDrugSchema, UsedDrugSchema, DrugSchema
+from schemas.entities import StoredDrugSchema, UsedDrugSchema, DrugSchema
 from .utils import date_to_mysql_string
 
 router = APIRouter(prefix="/drugs")
