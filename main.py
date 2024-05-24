@@ -16,12 +16,35 @@ import routing.orders
 import routing.patients
 import routing.production
 import routing.technologies
-from admin import (AdministrationRouteView, DrugTypeView, MixtureTypeView, CustomerView, DoctorView, LabWorkerView,
-                   PatientView, DrugView, MixtureView, TinctureView,
-                   PillView, PowderView, SalveView, SolutionView, DrugTypeAdministrationRouteView,
-                   PrescriptionView, OrderView, StorageItemView, SupplierView, SupplyView, TechnologyView,
-                   PrescriptionItemView, ProductionView, OrderWaitingDrugSupplyView, ReservedDrugView,
-                   ProductionLabWorkerView, TechnologyComponentView)
+from admin import (
+    AdministrationRouteView,
+    DrugTypeView,
+    MixtureTypeView,
+    CustomerView,
+    DoctorView,
+    LabWorkerView,
+    PatientView,
+    DrugView,
+    MixtureView,
+    TinctureView,
+    PillView,
+    PowderView,
+    SalveView,
+    SolutionView,
+    DrugTypeAdministrationRouteView,
+    PrescriptionView,
+    OrderView,
+    StorageItemView,
+    SupplierView,
+    SupplyView,
+    TechnologyView,
+    PrescriptionItemView,
+    ProductionView,
+    OrderWaitingDrugSupplyView,
+    ReservedDrugView,
+    ProductionLabWorkerView,
+    TechnologyComponentView,
+)
 from db import engine
 
 
