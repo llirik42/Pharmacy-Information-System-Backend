@@ -16,9 +16,13 @@ import routing.orders
 import routing.patients
 import routing.production
 import routing.technologies
+from admin import (AdministrationRouteView, DrugTypeView, MixtureTypeView, CustomerView, DoctorView, LabWorkerView,
+                   PatientView, DrugView, MixtureView, TinctureView,
+                   PillView, PowderView, SalveView, SolutionView, DrugTypeAdministrationRouteView,
+                   PrescriptionView, OrderView, StorageItemView, SupplierView, SupplyView, TechnologyView,
+                   PrescriptionItemView, ProductionView, OrderWaitingDrugSupplyView, ReservedDrugView,
+                   ProductionLabWorkerView, TechnologyComponentView)
 from db import engine
-
-from views import AdministrationRouteView
 
 
 @asynccontextmanager
@@ -48,6 +52,32 @@ app.include_router(routing.production.router)
 
 admin = Admin(app=app, engine=engine)
 admin.add_model_view(AdministrationRouteView)
+admin.add_model_view(DrugTypeView)
+admin.add_model_view(MixtureTypeView)
+admin.add_model_view(CustomerView)
+admin.add_model_view(DoctorView)
+admin.add_model_view(LabWorkerView)
+admin.add_model_view(PatientView)
+admin.add_model_view(SupplierView)
+admin.add_model_view(DrugView)
+admin.add_model_view(MixtureView)
+admin.add_model_view(TinctureView)
+admin.add_model_view(PillView)
+admin.add_model_view(PowderView)
+admin.add_model_view(SalveView)
+admin.add_model_view(SolutionView)
+admin.add_model_view(DrugTypeAdministrationRouteView)
+admin.add_model_view(PrescriptionView)
+admin.add_model_view(OrderView)
+admin.add_model_view(StorageItemView)
+admin.add_model_view(SupplyView)
+admin.add_model_view(TechnologyView)
+admin.add_model_view(PrescriptionItemView)
+admin.add_model_view(ProductionView)
+admin.add_model_view(OrderWaitingDrugSupplyView)
+admin.add_model_view(ReservedDrugView)
+admin.add_model_view(ProductionLabWorkerView)
+admin.add_model_view(TechnologyComponentView)
 
 
 @app.middleware("http")
