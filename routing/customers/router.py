@@ -28,7 +28,7 @@ async def get_customers(session: AsyncSession = Depends(get_session)) -> list[Cu
 @router.get("/search")
 async def find_customer(customer_id: int, session: AsyncSession = Depends(get_session)) -> CustomerSearchResponseSchema:
     optional_customer: Optional[Customer] = await session.get(Customer, ident=customer_id)
-    return CustomerSearchResponseSchema(customer=CustomerSchema.model_validate(optional_customer))
+    return CustomerSearchResponseSchema(customer=optional_customer)
 
 
 @router.post("/")

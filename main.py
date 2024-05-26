@@ -59,7 +59,7 @@ async def lifespan(app_: FastAPI):
     await engine.dispose()
 
 
-logging.config.fileConfig(fname="logging.ini")
+#logging.config.fileConfig(fname="logging.ini")
 
 root_logger = logging.getLogger("root")
 controller_logger = logging.getLogger("controller")

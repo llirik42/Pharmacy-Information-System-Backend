@@ -27,7 +27,7 @@ async def get_patients(session: AsyncSession = Depends(get_session)) -> list[Pat
 @router.get("/search")
 async def find_patient(patient_id: int, session: AsyncSession = Depends(get_session)) -> PatientSearchResponseSchema:
     optional_patient: Optional[Patient] = await session.get(Patient, ident=patient_id)
-    return PatientSearchResponseSchema(patient=PatientSchema.model_validate(optional_patient))
+    return PatientSearchResponseSchema(patient=optional_patient)
 
 
 @router.post("/")

@@ -15,6 +15,7 @@ from .order_obtain_response import OrderObtainResponseSchema
 from .order_obtain_status import OrderObtainStatus
 from .order_payment_response import OrderPaymentResponseSchema
 from .order_payment_status import OrderPaymentStatus
+from .order_search_response import OrderSearchResponseSchema
 
 router = APIRouter(prefix="/orders")
 logger = logging.getLogger("orders")
@@ -26,6 +27,26 @@ async def get_orders(session: AsyncSession = Depends(get_session)) -> list[Order
     query_result = await session.execute(query)
     return [OrderSchema.model_validate(order_orm) for order_orm in query_result.unique().scalars().all()]
 
+
+@router.get("/search")
+async def find_order(order_id: int, session: AsyncSession = Depends(get_session)) -> OrderSearchResponseSchema:
+    optional_order: Optional[Order] = await session.get(Order, ident=order_id)
+    return OrderSearchResponseSchema(order=optional_order)
+
+#
+# @router.post("/")
+# async def create_doctor(
+#         input_doctor: InputDoctorSchema, session: AsyncSession = Depends(get_session)
+# ) -> DoctorCreationResponseSchema:
+#     try:
+#         doctor = Doctor(full_name=input_doctor.full_name)
+#         await create_object(session, doctor)
+#         await session.commit()
+#         return DoctorCreationResponseSchema(status=DoctorCreationStatus.SUCCESS)
+#     except Exception as e:
+#         logger.error(f"Creation of ({input_doctor}) failed", exc_info=e)
+#         return DoctorCreationResponseSchema(status=DoctorCreationStatus.ALREADY_EXISTS)
+#
 
 @router.get("/forgotten")
 async def get_forgotten_orders(session: AsyncSession = Depends(get_session)) -> list[OrderSchema]:

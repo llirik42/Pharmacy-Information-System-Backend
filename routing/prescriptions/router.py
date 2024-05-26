@@ -29,7 +29,7 @@ async def find_prescription(
     prescription_id: int, session: AsyncSession = Depends(get_session)
 ) -> PrescriptionSearchResponseSchema:
     optional_prescription: Optional[Prescription] = await session.get(Prescription, ident=prescription_id)
-    return PrescriptionSearchResponseSchema(prescription=PrescriptionSchema.model_validate(optional_prescription))
+    return PrescriptionSearchResponseSchema(prescription=optional_prescription)
 
 
 @router.post("/")
