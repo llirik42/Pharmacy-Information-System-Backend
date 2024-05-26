@@ -21,7 +21,7 @@ logger = logging.getLogger("prescriptions")
 async def get_prescriptions(session: AsyncSession = Depends(get_session)) -> list[PrescriptionSchema]:
     query = select(Prescription)
     query_result = await session.execute(query)
-    return [PrescriptionSchema.model_validate(doctor_orm) for doctor_orm in query_result.scalars().unique().all()]
+    return [PrescriptionSchema.model_validate(p) for p in query_result.scalars().unique().all()]
 
 
 @router.get("/search")

@@ -18,11 +18,11 @@ async def get_production_components(session: AsyncSession = Depends(get_session)
 
     for row in query_result:
         drug_id: int = row[0]
-        drug_orm = await session.get(Drug, ident=drug_id)
+        drug = await session.get(Drug, ident=drug_id)
 
         production_components.append(
             ProductionComponentSchema(
-                component=DrugSchema.model_validate(drug_orm),
+                component=DrugSchema.model_validate(drug),
                 component_amount=row[1],
             )
         )

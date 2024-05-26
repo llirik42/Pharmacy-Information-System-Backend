@@ -17,7 +17,7 @@ router = APIRouter(prefix="/drugs")
 async def get_drugs(session: AsyncSession = Depends(get_session)) -> list[DrugSchema]:
     query = select(Drug)
     query_result = await session.execute(query)
-    return [DrugSchema.model_validate(drug_orm) for drug_orm in query_result.scalars().all()]
+    return [DrugSchema.model_validate(d) for d in query_result.scalars().all()]
 
 
 @router.get("/popular")
@@ -31,8 +31,8 @@ async def get_popular_drugs(
 
     for row in query_result:
         drug_id: int = row[0]
-        drug_orm = await session.get(Drug, ident=drug_id)
-        popular_drugs.append(UsedDrugSchema(drug=DrugSchema.model_validate(drug_orm), use_number=row[1]))
+        drug = await session.get(Drug, ident=drug_id)
+        popular_drugs.append(UsedDrugSchema(drug=DrugSchema.model_validate(drug), use_number=row[1]))
 
     return popular_drugs
 
@@ -46,8 +46,8 @@ async def get_critical_amount_drugs(session: AsyncSession = Depends(get_session)
 
     for row in query_result:
         drug_id: int = row[0]
-        drug_orm = await session.get(Drug, ident=drug_id)
-        critical_amount_drugs.append(DrugSchema.model_validate(drug_orm))
+        drug = await session.get(Drug, ident=drug_id)
+        critical_amount_drugs.append(DrugSchema.model_validate(drug))
 
     return critical_amount_drugs
 
@@ -63,8 +63,8 @@ async def get_minimal_amount_drugs(
 
     for row in query_result:
         drug_id: int = row[0]
-        drug_orm = await session.get(Drug, ident=drug_id)
-        minimal_amount_drugs.append(StoredDrugSchema(drug=DrugSchema.model_validate(drug_orm), stored_number=row[1]))
+        drug = await session.get(Drug, ident=drug_id)
+        minimal_amount_drugs.append(StoredDrugSchema(drug=DrugSchema.model_validate(drug), stored_number=row[1]))
 
     return minimal_amount_drugs
 
@@ -80,8 +80,8 @@ async def get_used_drugs(
 
     for row in query_result:
         drug_id: int = row[0]
-        drug_orm = await session.get(Drug, ident=drug_id)
-        used_drugs.append(UsedDrugSchema(drug=DrugSchema.model_validate(drug_orm), use_number=row[1]))
+        drug = await session.get(Drug, ident=drug_id)
+        used_drugs.append(UsedDrugSchema(drug=DrugSchema.model_validate(drug), use_number=row[1]))
 
     return used_drugs
 

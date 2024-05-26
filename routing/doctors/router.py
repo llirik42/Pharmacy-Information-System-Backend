@@ -21,7 +21,7 @@ logger = logging.getLogger("doctors")
 async def get_doctors(session: AsyncSession = Depends(get_session)) -> list[DoctorSchema]:
     query = select(Doctor)
     query_result = await session.execute(query)
-    return [DoctorSchema.model_validate(doctor_orm) for doctor_orm in query_result.scalars().all()]
+    return [DoctorSchema.model_validate(d) for d in query_result.scalars().all()]
 
 
 @router.get("/search")

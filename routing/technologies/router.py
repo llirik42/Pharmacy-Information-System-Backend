@@ -27,8 +27,8 @@ async def get_technologies(
 
     for row in query_result:
         technology_id: int = row[0]
-        technology_orm = await session.get(Technology, ident=technology_id)
-        technologies.append(TechnologySchema.model_validate(technology_orm))
+        technology = await session.get(Technology, ident=technology_id)
+        technologies.append(TechnologySchema.model_validate(technology))
 
     return technologies
 

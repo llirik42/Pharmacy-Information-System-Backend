@@ -22,7 +22,7 @@ logger = logging.getLogger("customers")
 async def get_customers(session: AsyncSession = Depends(get_session)) -> list[CustomerSchema]:
     query = select(Customer)
     query_result = await session.execute(query)
-    return [CustomerSchema.model_validate(customer_orm) for customer_orm in query_result.scalars().all()]
+    return [CustomerSchema.model_validate(c) for c in query_result.scalars().all()]
 
 
 @router.get("/search")
@@ -58,8 +58,8 @@ async def get_waiting_supplies_customers(
 
     for row in query_result:
         customer_id: int = row[0]
-        customer_orm = await session.get(Customer, ident=customer_id)
-        waiting_supplies_customers.append(CustomerSchema.model_validate(customer_orm))
+        customer = await session.get(Customer, ident=customer_id)
+        waiting_supplies_customers.append(CustomerSchema.model_validate(customer))
 
     return waiting_supplies_customers
 
@@ -83,8 +83,8 @@ async def get_ordered_something_customers(
 
     for row in result:
         customer_id: int = row[0]
-        customer_orm = await session.get(Customer, ident=customer_id)
-        ordered_something_customers.append(CustomerSchema.model_validate(customer_orm))
+        customer = await session.get(Customer, ident=customer_id)
+        ordered_something_customers.append(CustomerSchema.model_validate(customer))
 
     return ordered_something_customers
 
@@ -100,11 +100,11 @@ async def get_frequent_customers(
 
     for row in result:
         customer_id: int = row[0]
-        customer_orm = await session.get(Customer, ident=customer_id)
+        customer = await session.get(Customer, ident=customer_id)
 
         frequent_customers.append(
             FrequentCustomerSchema(
-                customer=CustomerSchema.model_validate(customer_orm),
+                customer=CustomerSchema.model_validate(customer),
                 order_count=row[1],
             )
         )

@@ -28,7 +28,7 @@ logger = logging.getLogger("orders")
 async def get_orders(session: AsyncSession = Depends(get_session)) -> list[OrderSchema]:
     query = select(Order)
     query_result = await session.execute(query)
-    return [OrderSchema.model_validate(order_orm) for order_orm in query_result.unique().scalars().all()]
+    return [OrderSchema.model_validate(o) for o in query_result.unique().scalars().all()]
 
 
 @router.get("/search")
@@ -64,8 +64,8 @@ async def get_forgotten_orders(session: AsyncSession = Depends(get_session)) -> 
 
     for row in query_result:
         order_id: int = row[0]
-        order_orm = await session.get(Order, ident=order_id)
-        forgotten_orders.append(OrderSchema.model_validate(order_orm))
+        order = await session.get(Order, ident=order_id)
+        forgotten_orders.append(OrderSchema.model_validate(order))
 
     return forgotten_orders
 
@@ -79,8 +79,8 @@ async def get_orders_in_production(session: AsyncSession = Depends(get_session))
 
     for row in query_result:
         order_id: int = row[0]
-        order_orm = await session.get(Order, ident=order_id)
-        orders_in_production.append(OrderSchema.model_validate(order_orm))
+        order = await session.get(Order, ident=order_id)
+        orders_in_production.append(OrderSchema.model_validate(order))
 
     return orders_in_production
 
