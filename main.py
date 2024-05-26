@@ -17,6 +17,7 @@ import routing.patients
 import routing.production
 import routing.technologies
 import routing.prescriptions
+import routing.administration_routes
 from admin import (
     AdministrationRouteView,
     DrugTypeView,
@@ -74,6 +75,7 @@ app.include_router(routing.patients.router)
 app.include_router(routing.technologies.router)
 app.include_router(routing.production.router)
 app.include_router(routing.prescriptions.router)
+app.include_router(routing.administration_routes.router)
 
 admin = Admin(app=app, engine=engine)
 admin.add_model_view(AdministrationRouteView)
