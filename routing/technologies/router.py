@@ -6,7 +6,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from db import get_session
 from models import Technology
-from schemas.entities import TechnologySchema
+from schemas import TechnologySchema
 
 router = APIRouter(prefix="/technologies")
 

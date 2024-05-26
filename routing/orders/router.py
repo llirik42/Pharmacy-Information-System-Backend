@@ -10,15 +10,11 @@ from db import get_session
 from models import (
     Order,
 )
-from schemas.entities import (
-    OrderSchema,
-)
-from schemas.responses import (
-    OrderObtainStatus,
-    OrderPaymentStatus,
-    OrderObtainResponseSchema,
-    OrderPaymentResponseSchema,
-)
+from schemas import OrderSchema
+from .order_obtain_response import OrderObtainResponseSchema
+from .order_obtain_status import OrderObtainStatus
+from .order_payment_response import OrderPaymentResponseSchema
+from .order_payment_status import OrderPaymentStatus
 
 router = APIRouter(prefix="/orders")
 logger = logging.getLogger("routing.orders")

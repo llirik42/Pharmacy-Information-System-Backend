@@ -4,7 +4,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from db import get_session
 from models import Patient
-from schemas.entities import PatientSchema
+from schemas import PatientSchema
 
 router = APIRouter(prefix="/patients")
 

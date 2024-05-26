@@ -7,8 +7,8 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from db import get_session
 from models import Customer
-from schemas.entities import CustomerSchema, FrequentCustomerSchema
-from .utils import date_to_mysql_string
+from routing.utils import date_to_mysql_string
+from schemas import CustomerSchema, FrequentCustomerSchema
 
 router = APIRouter(prefix="/customers")
 
