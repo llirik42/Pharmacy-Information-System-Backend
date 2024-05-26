@@ -10,12 +10,15 @@ from db import get_session
 from models import (
     Order,
 )
-from schemas import OrderSchema
+from schemas import OrderSchema, InputOrderSchema
+from .order_creation_response import OrderCreationResponseSchema
+from .order_creation_status import OrderCreationStatus
 from .order_obtain_response import OrderObtainResponseSchema
 from .order_obtain_status import OrderObtainStatus
 from .order_payment_response import OrderPaymentResponseSchema
 from .order_payment_status import OrderPaymentStatus
 from .order_search_response import OrderSearchResponseSchema
+from ..utils import create_object
 
 router = APIRouter(prefix="/orders")
 logger = logging.getLogger("orders")
@@ -33,20 +36,24 @@ async def find_order(order_id: int, session: AsyncSession = Depends(get_session)
     optional_order: Optional[Order] = await session.get(Order, ident=order_id)
     return OrderSearchResponseSchema(order=optional_order)
 
-#
-# @router.post("/")
-# async def create_doctor(
-#         input_doctor: InputDoctorSchema, session: AsyncSession = Depends(get_session)
-# ) -> DoctorCreationResponseSchema:
-#     try:
-#         doctor = Doctor(full_name=input_doctor.full_name)
-#         await create_object(session, doctor)
-#         await session.commit()
-#         return DoctorCreationResponseSchema(status=DoctorCreationStatus.SUCCESS)
-#     except Exception as e:
-#         logger.error(f"Creation of ({input_doctor}) failed", exc_info=e)
-#         return DoctorCreationResponseSchema(status=DoctorCreationStatus.ALREADY_EXISTS)
-#
+
+@router.post("/")
+async def create_order(
+    input_order: InputOrderSchema, session: AsyncSession = Depends(get_session)
+) -> OrderCreationResponseSchema:
+    try:
+        doctor = Order(
+            prescription_id=input_order.prescription_id,
+            registration_datetime=datetime.now(),
+            customer_id=input_order.customer_id,
+        )
+        await create_object(session, doctor)
+        await session.commit()
+        return OrderCreationResponseSchema(status=OrderCreationStatus.SUCCESS)
+    except Exception as e:
+        logger.error(f"Creation of ({input_order}) failed", exc_info=e)
+        return OrderCreationResponseSchema(status=OrderCreationStatus.INVALID)
+
 
 @router.get("/forgotten")
 async def get_forgotten_orders(session: AsyncSession = Depends(get_session)) -> list[OrderSchema]:
