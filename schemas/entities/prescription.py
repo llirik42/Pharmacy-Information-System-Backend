@@ -2,10 +2,10 @@ import datetime
 
 from pydantic import Field
 
-from .base import BaseSchema
 from .doctor import DoctorSchema
 from .patient import PatientSchema
-from .prescription_item import PrescriptionItemSchema
+from ..base import BaseSchema
+from ..prescription_item import PrescriptionItemSchema
 
 
 class PrescriptionSchema(BaseSchema):

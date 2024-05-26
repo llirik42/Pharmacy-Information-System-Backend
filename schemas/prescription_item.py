@@ -1,8 +1,7 @@
 from pydantic import Field
 
-from .administration_route import AdministrationRouteSchema
 from .base import BaseSchema
-from .drug import DrugSchema
+from .entities import AdministrationRouteSchema, DrugSchema
 
 
 class PrescriptionItemSchema(BaseSchema):

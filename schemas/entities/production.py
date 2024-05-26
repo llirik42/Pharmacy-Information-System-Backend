@@ -3,9 +3,9 @@ from typing import Optional
 
 from pydantic import Field
 
-from .base import BaseSchema
 from .order import OrderSchema
 from .technology import TechnologySchema
+from ..base import BaseSchema
 
 
 class ProductionSchema(BaseSchema):

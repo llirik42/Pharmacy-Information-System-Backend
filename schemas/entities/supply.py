@@ -3,9 +3,9 @@ from typing import Optional
 
 from pydantic import Field
 
-from .base import BaseSchema
 from .drug import DrugSchema
 from .supplier import SupplierSchema
+from ..base import BaseSchema
 
 
 class SupplySchema(BaseSchema):

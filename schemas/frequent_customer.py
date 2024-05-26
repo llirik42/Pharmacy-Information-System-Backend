@@ -1,7 +1,7 @@
 from pydantic import Field
 
-from .base.base import BaseSchema
-from .base.customer import CustomerSchema
+from .base import BaseSchema
+from .entities import CustomerSchema
 
 
 class FrequentCustomerSchema(BaseSchema):

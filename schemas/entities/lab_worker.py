@@ -1,6 +1,6 @@
 from pydantic import Field
 
-from .base import BaseSchema
+from ..base import BaseSchema
 
 
 class LabWorkerSchema(BaseSchema):

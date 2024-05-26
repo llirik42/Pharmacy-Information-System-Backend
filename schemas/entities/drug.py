@@ -1,7 +1,7 @@
 from pydantic import Field
 
-from .base import BaseSchema
 from .drug_type import DrugTypeSchema
+from ..base import BaseSchema
 
 
 class DrugSchema(BaseSchema):

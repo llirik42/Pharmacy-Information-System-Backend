@@ -2,9 +2,9 @@ from datetime import time
 
 from pydantic import Field
 
-from .base import BaseSchema
 from .drug import DrugSchema
-from .technology_component import TechnologyComponentSchema
+from ..base import BaseSchema
+from ..technology_component import TechnologyComponentSchema
 
 
 class TechnologySchema(BaseSchema):
