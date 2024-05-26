@@ -42,14 +42,14 @@ async def create_order(
     input_order: InputOrderSchema, session: AsyncSession = Depends(get_session)
 ) -> OrderCreationResponseSchema:
     try:
-        doctor = Order(
+        order = Order(
             prescription_id=input_order.prescription_id,
             registration_datetime=datetime.now(),
             customer_id=input_order.customer_id,
         )
-        await create_object(session, doctor)
+        await create_object(session, order)
         await session.commit()
-        return OrderCreationResponseSchema(status=OrderCreationStatus.SUCCESS)
+        return OrderCreationResponseSchema(status=OrderCreationStatus.SUCCESS, order_id=order.id)
     except Exception as e:
         logger.error(f"Creation of ({input_order}) failed", exc_info=e)
         return OrderCreationResponseSchema(status=OrderCreationStatus.INVALID)

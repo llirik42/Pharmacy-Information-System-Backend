@@ -62,7 +62,10 @@ async def create_prescription(
 
         await session.flush()
         await session.commit()
-        return PrescriptionCreationResponseSchema(status=PrescriptionCreationStatus.SUCCESS)
+        return PrescriptionCreationResponseSchema(
+            status=PrescriptionCreationStatus.SUCCESS,
+            prescription_id=prescription.id,
+        )
     except Exception as e:
         logger.error(f"Adding items of ({prescription}) failed", exc_info=e)
         return PrescriptionCreationResponseSchema(status=PrescriptionCreationStatus.INVALID)

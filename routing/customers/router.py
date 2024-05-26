@@ -41,10 +41,12 @@ async def create_customer(
         )
         await create_object(session, customer)
         await session.commit()
-        return CustomerCreationResponseSchema(status=CustomerCreationStatus.SUCCESS)
+        return CustomerCreationResponseSchema(status=CustomerCreationStatus.SUCCESS, customer_id=customer.id)
     except Exception as e:
         logger.error(f"Creation of ({input_customer}) failed", exc_info=e)
-        return CustomerCreationResponseSchema(status=CustomerCreationStatus.ALREADY_EXISTS_OR_INVALID)
+        return CustomerCreationResponseSchema(
+            status=CustomerCreationStatus.ALREADY_EXISTS_OR_INVALID,
+        )
 
 
 @router.get("/waiting-supplies")

@@ -38,7 +38,7 @@ async def create_doctor(
         doctor = Doctor(full_name=input_doctor.full_name)
         await create_object(session, doctor)
         await session.commit()
-        return DoctorCreationResponseSchema(status=DoctorCreationStatus.SUCCESS)
+        return DoctorCreationResponseSchema(status=DoctorCreationStatus.SUCCESS, doctor_id=doctor.id)
     except Exception as e:
         logger.error(f"Creation of ({input_doctor}) failed", exc_info=e)
         return DoctorCreationResponseSchema(status=DoctorCreationStatus.ALREADY_EXISTS)
