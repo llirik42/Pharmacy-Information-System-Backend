@@ -1,5 +1,3 @@
-import logging
-
 from fastapi import Depends, APIRouter
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -9,7 +7,6 @@ from models import Patient
 from schemas.entities import PatientSchema
 
 router = APIRouter(prefix="/patients")
-logger = logging.getLogger("patients")
 
 
 @router.get("/")

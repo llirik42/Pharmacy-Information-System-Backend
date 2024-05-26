@@ -17,9 +17,11 @@ __all__ = [
     "ProductionComponentSchema",
     "StoredDrugSchema",
     "UsedDrugSchema",
+    "BaseSchema",
 ]
 
 from .base.administration_route import AdministrationRouteSchema
+from .base.base import BaseSchema
 from .base.customer import CustomerSchema
 from .base.doctor import DoctorSchema
 from .base.drug import DrugSchema
