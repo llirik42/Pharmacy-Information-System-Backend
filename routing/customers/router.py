@@ -1,16 +1,22 @@
+import logging
 from datetime import date
 from typing import Optional
 
 from fastapi import APIRouter, Depends
 from sqlalchemy import select, text
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from db import get_session
 from models import Customer
-from routing.utils import date_to_mysql_string
-from schemas import CustomerSchema, FrequentCustomerSchema
+from schemas import CustomerSchema, FrequentCustomerSchema, InputCustomerSchema
+from .customer_creation_response import CustomerCreationResponseSchema
+from .customer_creation_status import CustomerCreationStatus
+from .customer_search_response import CustomerSearchResponseSchema
+from ..utils import date_to_mysql_string, create_object
 
 router = APIRouter(prefix="/customers")
+logger = logging.getLogger("customers")
 
 
 @router.get("/")
@@ -18,6 +24,28 @@ async def get_customers(session: AsyncSession = Depends(get_session)) -> list[Cu
     query = select(Customer)
     query_result = await session.execute(query)
     return [CustomerSchema.model_validate(customer_orm) for customer_orm in query_result.scalars().all()]
+
+
+@router.get("/search")
+async def find_customer(customer_id: int, session: AsyncSession = Depends(get_session)) -> CustomerSearchResponseSchema:
+    optional_customer: Optional[CustomerSchema] = await session.get(Customer, ident=customer_id)
+    return CustomerSearchResponseSchema(customer=optional_customer)
+
+
+@router.post("/")
+async def create_customer(
+    input_customer: InputCustomerSchema, session: AsyncSession = Depends(get_session)
+) -> CustomerCreationResponseSchema:
+    try:
+        customer = Customer(
+            full_name=input_customer.full_name, phone_number=input_customer.phone_number, address=input_customer.address
+        )
+        await create_object(session, customer)
+        await session.commit()
+        return CustomerCreationResponseSchema(status=CustomerCreationStatus.SUCCESS)
+    except IntegrityError as e:
+        logger.error(f"Creation of ({input_customer}) failed", exc_info=e)
+        return CustomerCreationResponseSchema(status=CustomerCreationStatus.ALREADY_EXISTS_OR_INVALID)
 
 
 @router.get("/waiting-supplies")

@@ -33,7 +33,7 @@ async def find_doctor(doctor_id: int, session: AsyncSession = Depends(get_sessio
 
 @router.post("/")
 async def create_doctor(
-        input_doctor: InputDoctorSchema, session: AsyncSession = Depends(get_session)
+    input_doctor: InputDoctorSchema, session: AsyncSession = Depends(get_session)
 ) -> DoctorCreationResponseSchema:
     try:
         doctor = Doctor(full_name=input_doctor.full_name)
