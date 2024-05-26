@@ -1,4 +1,5 @@
 import logging
+from typing import Optional
 
 from fastapi import APIRouter, Depends
 from sqlalchemy import select
@@ -10,6 +11,7 @@ from models import Doctor
 from schemas import DoctorSchema, InputDoctorSchema
 from .doctor_creation_response import DoctorCreationResponseSchema
 from .doctor_creation_status import DoctorCreationStatus
+from .doctor_search_response import DoctorSearchResponseSchema
 from ..utils import create_object
 
 router = APIRouter(prefix="/doctors")
@@ -23,9 +25,15 @@ async def get_doctors(session: AsyncSession = Depends(get_session)) -> list[Doct
     return [DoctorSchema.model_validate(doctor_orm) for doctor_orm in query_result.scalars().all()]
 
 
+@router.get("/search")
+async def find_doctor(doctor_id: int, session: AsyncSession = Depends(get_session)) -> DoctorSearchResponseSchema:
+    optional_doctor: Optional[DoctorSchema] = await session.get(Doctor, ident=doctor_id)
+    return DoctorSearchResponseSchema(doctor=optional_doctor)
+
+
 @router.post("/")
 async def create_doctor(
-    input_doctor: InputDoctorSchema, session: AsyncSession = Depends(get_session)
+        input_doctor: InputDoctorSchema, session: AsyncSession = Depends(get_session)
 ) -> DoctorCreationResponseSchema:
     try:
         doctor = Doctor(full_name=input_doctor.full_name)
