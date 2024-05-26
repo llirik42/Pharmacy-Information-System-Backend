@@ -16,6 +16,7 @@ import routing.orders
 import routing.patients
 import routing.production
 import routing.technologies
+import routing.prescriptions
 from admin import (
     AdministrationRouteView,
     DrugTypeView,
@@ -58,7 +59,7 @@ async def lifespan(app_: FastAPI):
     await engine.dispose()
 
 
-logging.config.fileConfig(fname="logging.ini")
+#logging.config.fileConfig(fname="logging.ini")
 
 root_logger = logging.getLogger("root")
 controller_logger = logging.getLogger("controller")
@@ -72,6 +73,7 @@ app.include_router(routing.doctors.router)
 app.include_router(routing.patients.router)
 app.include_router(routing.technologies.router)
 app.include_router(routing.production.router)
+app.include_router(routing.prescriptions.router)
 
 admin = Admin(app=app, engine=engine)
 admin.add_model_view(AdministrationRouteView)

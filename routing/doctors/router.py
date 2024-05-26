@@ -3,7 +3,6 @@ from typing import Optional
 
 from fastapi import APIRouter, Depends
 from sqlalchemy import select
-from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from db import get_session
@@ -27,8 +26,8 @@ async def get_doctors(session: AsyncSession = Depends(get_session)) -> list[Doct
 
 @router.get("/search")
 async def find_doctor(doctor_id: int, session: AsyncSession = Depends(get_session)) -> DoctorSearchResponseSchema:
-    optional_doctor: Optional[DoctorSchema] = await session.get(Doctor, ident=doctor_id)
-    return DoctorSearchResponseSchema(doctor=optional_doctor)
+    optional_doctor: Optional[Doctor] = await session.get(Doctor, ident=doctor_id)
+    return DoctorSearchResponseSchema(doctor=DoctorSchema.model_validate(optional_doctor))
 
 
 @router.post("/")
@@ -40,6 +39,6 @@ async def create_doctor(
         await create_object(session, doctor)
         await session.commit()
         return DoctorCreationResponseSchema(status=DoctorCreationStatus.SUCCESS)
-    except IntegrityError as e:
+    except Exception as e:
         logger.error(f"Creation of ({input_doctor}) failed", exc_info=e)
         return DoctorCreationResponseSchema(status=DoctorCreationStatus.ALREADY_EXISTS)

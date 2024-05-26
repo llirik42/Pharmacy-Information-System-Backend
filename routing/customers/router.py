@@ -4,7 +4,6 @@ from typing import Optional
 
 from fastapi import APIRouter, Depends
 from sqlalchemy import select, text
-from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from db import get_session
@@ -28,8 +27,8 @@ async def get_customers(session: AsyncSession = Depends(get_session)) -> list[Cu
 
 @router.get("/search")
 async def find_customer(customer_id: int, session: AsyncSession = Depends(get_session)) -> CustomerSearchResponseSchema:
-    optional_customer: Optional[CustomerSchema] = await session.get(Customer, ident=customer_id)
-    return CustomerSearchResponseSchema(customer=optional_customer)
+    optional_customer: Optional[Customer] = await session.get(Customer, ident=customer_id)
+    return CustomerSearchResponseSchema(customer=CustomerSchema.model_validate(optional_customer))
 
 
 @router.post("/")
@@ -43,7 +42,7 @@ async def create_customer(
         await create_object(session, customer)
         await session.commit()
         return CustomerCreationResponseSchema(status=CustomerCreationStatus.SUCCESS)
-    except IntegrityError as e:
+    except Exception as e:
         logger.error(f"Creation of ({input_customer}) failed", exc_info=e)
         return CustomerCreationResponseSchema(status=CustomerCreationStatus.ALREADY_EXISTS_OR_INVALID)
 
