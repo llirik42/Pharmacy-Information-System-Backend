@@ -17,7 +17,7 @@ from .order_payment_response import OrderPaymentResponseSchema
 from .order_payment_status import OrderPaymentStatus
 
 router = APIRouter(prefix="/orders")
-logger = logging.getLogger("routing.orders")
+logger = logging.getLogger("orders")
 
 
 @router.get("/")
